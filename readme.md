@@ -1,326 +1,168 @@
-# 🤖 DeployNow: Discord Bot
+# 🚀 Bloom: Economy Discord Bot Starter  
 
-A powerful Discord bot template built with **Discord.js** and **Sapphire.js**, focused on creating moderation and economy bots with ease. Designed for scalability, this template provides a pre-built framework for building professional-grade bots.
+Build smarter, faster, and better with Bloom – the ultimate Discord bot starter kit for creating feature-rich server bots. Whether you're building moderation tools or an engaging economy system, Bloom is designed to handle it all.  
 
----
+---  
 
-## 🚀 Features
+## ⚠️ Important  
 
-- **Advanced Command Framework**: Built on Sapphire.js for effortless command handling, including slash commands and context menus.
-- **Event Handlers**: Modular event architecture for precise handling of Discord gateway events.
-- **Dynamic Error Handling**: Comprehensive error messages for invalid input, missing permissions, and more.
-- **Edge Case Management**: Prevents race conditions, duplicate commands, and invalid data states.
-- **Role and Permission Checks**: Ensures only authorized users can access admin or high-risk commands.
-- **Per-Guild Settings**: Fully configured per-guild data to customize moderation, economy, and more for each server.
-- **Logging System**: Tracks all major actions (economy, moderation) for transparency and auditing.
-- **Database Integration**: Pre-configured with **Enmap** for managing all economy and bot-related data with persistence.
+**This bot template is exclusively for paid users.** Sharing, redistributing, or reselling is strictly prohibited. Each purchase grants a license for a single user or team use.  
 
----
+> **Do not share. Redistribution violates your license agreement.**  
 
-## 📦 Command Overview
+---  
 
-### **Economy Commands**
+## ✨ Features  
 
-#### **Economy Role Admin Commands**
-1. `/addcoins`  
-   **Description**: Adds a specified amount of coins to a user's account.  
-   **Props**:  
-   - `user` (required): The user to add coins to.  
-   - `amount` (required): The amount of coins to add.  
-   **Validations**: Ensures `amount` is a positive integer.  
-   **Example**: `/addcoins @user 1000`
+- **Advanced Command Framework**: Built with Sapphire.js for handling slash commands and context menus.  
+- **Interactive Economy System**: Engage your server community with coins, shops, leaderboards, and more.  
+- **Comprehensive Moderation Tools**: Pre-built moderation commands for efficient server management.  
+- **Modular Event Handlers**: Scalable architecture to handle Discord gateway events.  
+- **Persistent Database**: Enmap-backed fast and reliable storage for economy data, user balances, and server settings.  
 
-2. `/removecoins`  
-   **Description**: Removes a specified amount of coins from a user's account.  
-   **Props**:  
-   - `user` (required): The user to remove coins from.  
-   - `amount` (required): The amount of coins to remove.  
-   **Validations**: Ensures balance doesn’t go below zero.  
-   **Example**: `/removecoins @user 500`
+---  
 
-3. `/setcoins`  
-   **Description**: Sets a user's balance to a specific amount.  
-   **Props**:  
-   - `user` (required): The user to set the balance for.  
-   - `amount` (required): The balance amount.  
-   **Validations**: Ensures `amount` is a valid positive integer.  
-   **Example**: `/setcoins @user 2000`
+## 🌟 Why Choose Bloom?  
 
-4. `/additem`  
-   **Description**: Adds a new item to the server's shop with a specified price.  
-   **Props**:  
-   - `item` (required): The name of the item.  
-   - `price` (required): The item's price.  
-   **Validations**: Prevents duplicate items and ensures valid pricing.  
-   **Example**: `/additem "Golden Sword" 500`
+- **Performance Optimized**: Scalable for large servers with thousands of users.  
+- **Developer Friendly**: Clean, pre-configured code saves you time.  
+- **Customizable Features**: Extend and modify the bot to suit your server's unique needs.  
+- **Community Focused**: Features designed to enhance engagement and foster active communities.  
 
-5. `/removeitem`  
-   **Description**: Removes an item from the shop.  
-   **Props**:  
-   - `item` (required): The name of the item to remove.  
-   **Validations**: Ensures the item exists in the shop.  
-   **Example**: `/removeitem "Golden Sword"`
+---  
 
-6. `/edititem`  
-   **Description**: Edits an existing item's price in the shop.  
-   **Props**:  
-   - `item` (required): The name of the item.  
-   - `new_price` (required): The new price of the item.  
-   **Validations**: Ensures the item exists and `new_price` is valid.  
-   **Example**: `/edititem "Golden Sword" 700`
+## ⚙️ Core Features  
 
-7. `/clearshop`  
-   **Description**: Clears all items in the shop.  
-   **Props**: None.  
-   **Example**: `/clearshop`
+### 💰 Economy User Commands  
+- `/balance [user]`: Check your or another user's balance.  
+- `/daily`: Claim daily coins.  
+- `/weekly`: Claim weekly coins.  
+- `/work`: Earn coins through a task.  
+- `/buy [item]`: Buy an item from the shop.  
+- `/shop`: View available items in the shop.  
+- `/inventory [user]`: View your or another user's inventory.  
+- `/leaderboard`: See the top users by balance.  
+- `/flipcoin [amount]`: Bet on a coin flip game.  
+- `/slots [amount]`: Play the slot machine.  
+- `/blackjack [amount]`: Play a game of blackjack.  
+- `/rps [choice] [amount]`: Play rock-paper-scissors for coins.  
+- `/spinwheel [amount]`: Spin a wheel for random rewards.  
+- `/lottery-ticket [amount]`: Buy and scratch a lottery ticket.  
 
-8. `/resetinventory`  
-   **Description**: Clears a user's inventory.  
-   **Props**:  
-   - `user` (required): The user whose inventory to reset.  
-   **Example**: `/resetinventory @user`
+### ⚙️ Admin Economy Commands  
+- `/addcoins [user] [amount]`: Add coins to a user's account.  
+- `/removecoins [user] [amount]`: Remove coins from a user's account.  
+- `/setcoins [user] [amount]`: Set a user's balance.  
+- `/additem [item] [price]`: Add a new item to the shop.  
+- `/removeitem [item]`: Remove an item from the shop.  
+- `/edititem [item] [new_price]`: Edit an existing item's price.  
+- `/clearshop`: Clear all items in the shop.  
+- `/resetinventory [user]`: Reset a user's inventory.  
+- `/resetleaderboard`: Reset the entire leaderboard.  
+- `/disableeconomy`: Disable the economy system for the server.  
+- `/enableeconomy`: Re-enable the economy system for the server.  
+- `/setup`: Configure server settings, including:  
+  - Admin roles  
+  - Economy enable/disable  
+  - Daily and weekly rewards  
+  - Modlog and action log channels  
 
-9. `/resetleaderboard`  
-   **Description**: Resets the leaderboard data.  
-   **Props**: None.  
-   **Example**: `/resetleaderboard`
+### 🛠️ Additional Commands  
+- `/ping`: Check bot's connectivity and response time.  
+- `/help`: Display all available commands and bot information.  
 
-10. `/disableeconomy`  
-    **Description**: Disables the economy system for the server.  
-    **Props**: None.  
-    **Example**: `/disableeconomy`
+---  
 
-11. `/enableeconomy`  
-    **Description**: Re-enables the economy system for the server.  
-    **Props**: None.  
-    **Example**: `/enableeconomy`
+## 🌟 Why Bloom Stands Out  
+
+- **Time-Saving**: Pre-built features let you get started immediately, reducing development time.  
+- **Scalable Architecture**: Designed to grow with your community.  
+- **Powerful Framework**: Sapphire.js ensures maintainability and robustness.  
+- **Customizable User Experience**: Enhance and tailor bot interactions to your server's needs.  
+
+---  
+
+## 🚀 Getting Started  
+
+### 1. **Download the Repository**  
+
+Access the secure download once purchased you can download this repository:
+
+[View Product Directly](https://deploynow.site/products/economy-discord-bot)
+[View All Products Owned](https://deploynow.site/user/products)
+
+> **Do not share this repository. Redistribution violates your license agreement.**
 
 ---
 
-#### **User Commands**
-1. `/balance`  
-   **Description**: Displays the current balance of a user.  
-   **Props**:  
-   - `user` (optional): The user to check the balance for. Defaults to the command issuer.  
-   **Example**: `/balance`
+### 2. **Install Dependencies**  
+Run the following command to install required packages:  
 
-2. `/daily`  
-   **Description**: Claims a daily reward of coins.  
-   **Props**: None.  
-   **Validations**: Ensures cooldowns are respected.  
-   **Example**: `/daily`
-
-3. `/weekly`  
-   **Description**: Claims a weekly reward of coins.  
-   **Props**: None.  
-   **Validations**: Ensures cooldowns are respected.  
-   **Example**: `/weekly`
-
-4. `/work`  
-   **Description**: Earns coins by completing a random work task.  
-   **Props**: None.  
-   **Example**: `/work`
-
-5. `/buy`  
-   **Description**: Purchases an item from the shop.  
-   **Props**:  
-   - `item` (required): The name of the item to purchase.  
-   **Validations**: Ensures the user has enough balance and the item exists.  
-   **Example**: `/buy "Golden Sword"`
-
-6. `/shop`  
-   **Description**: Displays all available items in the shop.  
-   **Props**: None.  
-   **Example**: `/shop`
-
-7. `/inventory`  
-   **Description**: Displays the inventory of a user.  
-   **Props**:  
-   - `user` (optional): The user whose inventory to display. Defaults to the command issuer.  
-   **Example**: `/inventory`
-
-8. `/leaderboard`  
-   **Description**: Displays the top users with the highest balances.  
-   **Props**: None.  
-   **Example**: `/leaderboard`
-
-9. `/flipcoin`
-   **Description**: Bets coins on a coin flip (heads or tails).
-   **Props**:
-   - `amount` (required): The amount of coins to bet.
-   **Validations**:
-   - Ensures the user has enough coins.
-   - Limits the bet amount to prevent abuse.
-   **Example**: `/flipcoin 100`
-
-10. `/slots`
-   **Description**: Plays a slot machine game to win coins.
-   **Props**:
-   - `amount` (required): The amount of coins to bet.
-   **Validations**:
-   - Ensures the user has enough coins.
-   - Limits the bet amount and includes cooldowns.
-   **Example**: `/slots 50`
-
-11. `/blackjack`
-   **Description**: Plays a game of blackjack for coins.
-   **Props**:
-   - `amount` (required): The amount of coins to bet.
-   **Validations**:
-   - Ensures valid bet amounts.
-   - Handles automatic calculations for wins/losses.
-   **Example**: `/blackjack 200`
-
-12. `/rps`
-   **Description**: Plays rock-paper-scissors against the bot for coins.
-   **Props**:
-   - `choice` (required): The player's choice (`rock`, `paper`, or `scissors`).
-   - `amount` (required): The amount of coins to bet.
-   **Validations**:
-   - Ensures valid input for `choice`.
-   - Verifies sufficient balance and bet amount.
-   **Example**: `/rps rock 100`
-
-13. `/spinwheel`
-   **Description**: Spins a wheel for random rewards.
-   **Props**:
-   - `amount` (required): The amount of coins to spend on the spin.
-   **Validations**:
-   - Ensures sufficient balance.
-   - Includes a configurable cooldown per server.
-   **Example**: `/spinwheel 50`
-
-14. `/lottery-ticket`
-   **Description**: Buys and scratches a lottery ticket for a chance to win coins.
-   **Props**:
-   - `amount` (required): The price of the lottery ticket.
-   **Validations**:
-   - Verifies that the ticket price is valid.
-   - Ensures sufficient balance before purchase.
-   **Example**: `/lottery-ticket 50`
-
-
-15. & 16.   ping & help as well
+```
+npm install
+```
 
 ---
 
-## 🗄 Database Setup
+### 3. **Set Up Environment Variables**  
 
-### Using Enmap
-The bot uses **Enmap** for all data storage, providing fast, persistent, and easy-to-use key-value data handling.
+Create a `.env` file in the root directory and add the following:  
 
-### Enmap Structures
-
-1. **User Data**
-   - **Purpose**: Tracks individual user data, including balances and inventory.
-   - **Key**: User ID.
-   - **Value Example**:
-     ```json
-     {
-       "balance": 1000,
-       "bank": 500,
-       "inventory": [
-         { "item": "Golden Sword", "quantity": 1 },
-         { "item": "Shield", "quantity": 2 }
-       ]
-     }
-     ```
-   - **Edge Case Handling**:
-     - Prevents negative balances or deposits.
-     - Validates inventory actions (e.g., removing items not owned).
-
-2. **Shop Data**
-   - **Purpose**: Stores available items in the shop.
-   - **Key**: Item Name.
-   - **Value Example**:
-     ```json
-     {
-       "price": 500,
-       "description": "A mighty sword for battles."
-     }
-     ```
-   - **Edge Case Handling**:
-     - Disallows duplicate item names.
-     - Validates positive pricing values.
-
-3. **Server Settings**
-   - **Purpose**: Stores per-server configurations.
-   - **Key**: Server ID.
-   - **Value Example**:
-     ```json
-     {
-       "modlogChannel": "123456789012345678",
-       "economyEnabled": true,
-       "dailyReward": 100
-     }
-     ```
-   - **Edge Case Handling**:
-     - Ensures server-specific settings are isolated.
-     - Prevents invalid configuration values.
-
-4. **Logs Data**
-   - **Purpose**: Tracks all significant actions for auditing purposes.
-   - **Key**: Action ID.
-   - **Value Example**:
-     ```json
-     {
-       "user": "123456789012345678",
-       "action": "addcoins",
-       "amount": 500,
-       "timestamp": "2024-11-19T12:00:00Z"
-     }
-     ```
-
-5. **Leaderboard Data**
-   - **Purpose**: Automatically calculated based on user balances.
-   - **Key**: Leaderboard ID.
-   - **Value Example**:
-     ```json
-     [
-       { "user": "123456789012345678", "balance": 1000 },
-       { "user": "987654321098765432", "balance": 800 }
-     ]
-     ```
+```
+# Discord Bot Configuration
+DISCORD_BOT_TOKEN="<your-bot-token>"
+DISCORD_CLIENT_ID="<your-client-id>"
+DISCORD_CLIENT_SECRET="<your-client-secret>"
+```
 
 ---
 
-## Edge Cases and Validations
+### 4. **Build the Bot**
 
-### Input Validation
-- **Numeric Validation**: Ensures all numeric fields (e.g., balances, amounts) are valid, positive, and within reasonable limits.
-- **User Validation**: Verifies user mentions exist and are valid members of the guild.
+Run the following command to build the bot:
 
-### Command Cooldowns
-- Cooldowns prevent rapid execution of commands like `/rob` or `/work`.
-- Configurable per server.
+```
+npm run build
+```
 
-### Permissions
-- Economy Role Admin commands enforce role or permission checks (`Economy Role`).
-- User commands are restricted to valid roles for economy actions.
+### 5. **Run the Bot**  
 
-### Data Integrity
-- Prevents data corruption by validating all Enmap writes.
-- Ensures atomic operations (e.g., simultaneous updates on balances).
+Run the following command to start the bot:  
+
+```
+npm run start
+```
 
 ---
 
-## Logging and Debugging
+## 📦 Deployment  
 
-### Logs
-- Tracks admin actions (e.g., `/addcoins`) and stores logs in a dedicated Enmap structure for auditing.
+Bloom is pre-configured for deployment on hosting platforms like SparkedHost, Railway, Heroku, or VPS servers.  
 
-### Error Handling
-- Comprehensive try-catch blocks for all command handlers.
-- User-friendly error messages for invalid inputs or permissions.
+1. Push your project to a GitHub repository.  
+2. Deploy using your preferred platform.  
+3. Configure environment variables in the hosting environment.  
+4. Launch your bot.  
 
-## Initial Setup
+---
 
-1. **Default Settings**:
-   - `dailyReward`: `100`
-   - `weeklyReward`: `500`
-   - `economyEnabled`: `true`
-   - `modlogChannel`: `null` (must be set by admin).
-   - `actionlogChannel`: `null` (must be set by admin).
+## 📃 License  
 
-2. **Setup Commands**:
-   - `/setup`: Configure economy settings, economy role(defaults to admin), logging channels and other settings.  
+### Bloom  
+
+This template is licensed for individual or team use. Redistribution, sharing, or resale in its original or modified form is strictly prohibited. Each purchase grants a license for personal or commercial use with adherence to the terms specified in the Bloom License v1.0.  
+
+For full details, refer to the [Bloom License v1.0](LICENSE).  
+
+---
+
+## 💌 Support  
+
+If you have any questions or need assistance, please contact us:  
+
+[Contact Form](https://deploynow.site/contact)  
+[Discord Server](https://discord.gg/7zV3EpRM4P)  
+
+---  
+
+**Build smarter, faster, and better with Bloom!**  

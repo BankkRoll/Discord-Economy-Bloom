@@ -11,7 +11,7 @@ import {
 } from "discord.js";
 import { ApplicationCommandRegistry, Command } from "@sapphire/framework";
 
-import { hasAdminOrRolePermission } from "@utils/permissions";
+import { hasAdminOrRolePermission } from "../utils/permissions";
 
 type CommandCategory = {
   emoji: string;

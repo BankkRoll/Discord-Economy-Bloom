@@ -1,25 +1,25 @@
 {
   "compilerOptions": {
-    "target": "ES2020", // Target modern JavaScript
-    "module": "commonjs", // Node.js module system
+    "target": "ES2020",
+    "module": "ESNext",
     "lib": ["ES2020"],
-    "strict": true, // Enable all strict type-checking options
+    "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true, // Skip type checks on all declaration files (*.d.ts)
+    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "outDir": "./dist", // Output directory for compiled files
-    "rootDir": "./src", // Root directory of input files
-    "noImplicitReturns": true, // Report error when not all code paths in function return a value
-    "noFallthroughCasesInSwitch": true, // Report errors for fallthrough cases in switch statements
-    "resolveJsonModule": true, // Support importing JSON files
-    "allowSyntheticDefaultImports": true, // Allow default imports from modules with no default export
-    "isolatedModules": true, // Ensure that each file can be safely transpiled without relying on other imports
-    "moduleResolution": "node", // Use Node's module resolution algorithm
-    "types": ["node"], // Include typings for Node and Jest
-    "sourceMap": true, // Generate source maps for easier debugging
-    "baseUrl": ".", // Base directory to resolve non-relative module names
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
+    "moduleResolution": "node",
+    "types": ["node"],
+    "sourceMap": true,
+    "baseUrl": ".",
     "paths": {
-      "@utils/*": ["src/utils/*"], // Aliases for cleaner imports
+      "@utils/*": ["src/utils/*"],
       "@commands/*": ["src/commands/*"]
     }
   },

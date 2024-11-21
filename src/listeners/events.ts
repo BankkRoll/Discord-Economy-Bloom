@@ -3,7 +3,7 @@
 import { Client, TextChannel } from "discord.js";
 import { LogsData, ServerSettings } from "../database/enmap";
 
-import { createEmbed } from "@utils/embed";
+import { createEmbed } from "../utils/embed";
 
 /**
  * Logs an action to Enmap and optionally sends an embed to the logs channel.
