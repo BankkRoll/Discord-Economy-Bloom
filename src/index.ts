@@ -1,8 +1,9 @@
+// src\index.ts
 import "dotenv/config";
 
 import { ActivityType, GatewayIntentBits } from "discord.js";
 
-import { Logger } from "./utils/logger";
+import { Logger } from "./utils/logger.js";
 import { SapphireClient } from "@sapphire/framework";
 
 const client = new SapphireClient({
@@ -52,7 +53,6 @@ function setDynamicActivity() {
   setInterval(() => {
     const activity = activities[index % activities.length];
     client.user?.setActivity(activity.name, { type: activity.type });
-    Logger.info(`Activity updated: ${activity.type} ${activity.name}`);
     index++;
   }, 10000);
 }

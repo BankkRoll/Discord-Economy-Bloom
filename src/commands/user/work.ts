@@ -1,9 +1,9 @@
 import { ApplicationCommandRegistry, Command } from "@sapphire/framework";
 
 import { ChatInputCommandInteraction } from "discord.js";
-import { UserData } from "../../database/enmap";
-import { createEmbed } from "../../utils/embed";
-import { logAction } from "../../listeners/events";
+import { UserData } from "../../database/enmap.js";
+import { createEmbed } from "../../utils/embed.js";
+import { logAction } from "../../utils/events.js";
 
 export default class WorkCommand extends Command {
   constructor(context: Command.Context, options: Command.Options) {

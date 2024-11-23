@@ -1,9 +1,12 @@
 import { ApplicationCommandRegistry, Command } from "@sapphire/framework";
-import { ShopData, UserData } from "../../database/enmap";
+import {
+  ChatInputCommandInteraction,
+  EmbedBuilder,
+  GuildMember,
+} from "discord.js";
+import { ShopData, UserData } from "../../database/enmap.js";
 
-import { ChatInputCommandInteraction } from "discord.js";
-import { createEmbed } from "../../utils/embed";
-import { logAction } from "../../listeners/events";
+import { logAction } from "../../utils/events.js";
 
 export default class BuyCommand extends Command {
   constructor(context: Command.Context, options: Command.Options) {
@@ -48,6 +51,7 @@ export default class BuyCommand extends Command {
       });
     }
 
+    // Deduct balance and add item to inventory
     userData.balance -= item.price;
     const inventoryItem = userData.inventory.find(
       (i: any) => i.item === itemName
@@ -59,23 +63,54 @@ export default class BuyCommand extends Command {
     }
     UserData.set(user.id, userData);
 
-    const embed = createEmbed({
-      title: "Purchase Successful",
-      fields: [
-        { name: "Item", value: itemName, inline: true },
-        { name: "Price", value: `${item.price} coins`, inline: true },
-        {
-          name: "Remaining Balance",
-          value: `${userData.balance} coins`,
-          inline: true,
-        },
-      ],
-      color: 0x22c55e,
-      timestamp: new Date(),
-    });
+    const embedFields = [
+      { name: "Item", value: itemName, inline: true },
+      { name: "Price", value: `${item.price} coins`, inline: true },
+      {
+        name: "Remaining Balance",
+        value: `${userData.balance} coins`,
+        inline: true,
+      },
+    ];
+
+    let roleAssigned = false;
+
+    // Handle role assignment if the item has an associated role
+    if (item.roleId) {
+      const guild = interaction.guild;
+      const member = interaction.member as GuildMember;
+
+      if (guild && member) {
+        const role = guild.roles.cache.get(item.roleId);
+
+        if (role) {
+          await member.roles.add(role);
+          roleAssigned = true;
+
+          embedFields.push({
+            name: "Role Granted",
+            value: `You have been granted the **${role.name}** role.`,
+            inline: false,
+          });
+        } else {
+          embedFields.push({
+            name: "Role Not Found",
+            value: `The role associated with this item could not be found.`,
+            inline: false,
+          });
+        }
+      }
+    }
+
+    const embed = new EmbedBuilder()
+      .setTitle("Purchase Successful")
+      .addFields(embedFields)
+      .setColor(0x22c55e)
+      .setTimestamp();
 
     await interaction.reply({ embeds: [embed] });
 
+    // Log the Action
     await logAction(
       interaction.guildId || "",
       {
@@ -83,7 +118,9 @@ export default class BuyCommand extends Command {
         action: "buy",
         item: itemName,
         amount: item.price,
-        description: `User purchased **${itemName}** for \`${item.price} coins\`.`,
+        description: `User purchased **${itemName}** for \`${item.price} coins\`. ${
+          roleAssigned ? "Role granted: Yes." : "Role granted: No."
+        }`,
       },
       interaction.client
     );

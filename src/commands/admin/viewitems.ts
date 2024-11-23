@@ -10,13 +10,14 @@ import {
 import { ApplicationCommandRegistry, Command } from "@sapphire/framework";
 
 import { ShopData } from "../../database/enmap.js";
+import { hasAdminOrRolePermission } from "../../utils/permissions.js";
 
-export default class ShopCommand extends Command {
+export default class ViewItemsCommand extends Command {
   constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
-      name: "shop",
-      description: "View items available in the shop.",
+      name: "viewitems",
+      description: "View all items in the shop.",
     });
   }
 
@@ -27,11 +28,20 @@ export default class ShopCommand extends Command {
   }
 
   async chatInputRun(interaction: ChatInputCommandInteraction) {
-    // Convert ShopData to an array
+    const member = interaction.guild?.members.cache.get(interaction.user.id);
+    if (!hasAdminOrRolePermission(member, interaction.guildId)) {
+      await interaction.reply({
+        content: `❌ You do not have permission to use this command.`,
+        ephemeral: true,
+      });
+      return;
+    }
+
+    // Convert the ShopData entries to an array
     const items = Array.from(ShopData.entries());
     if (items.length === 0) {
       await interaction.reply({
-        content: "🛒 The shop is currently empty! Check back later.",
+        content: "❌ No items available in the shop currently.",
         ephemeral: true,
       });
       return;
@@ -47,17 +57,38 @@ export default class ShopCommand extends Command {
       const currentItems = items.slice(start, end);
 
       const embed = new EmbedBuilder()
-        .setTitle("🛍️ Shop Items")
-        .setColor(0x2563eb)
+        .setTitle("Shop Items")
+        .setColor(0x3498db)
         .setTimestamp()
         .setFooter({ text: `Page ${page + 1} of ${pages}` });
 
       currentItems.forEach(([itemName, itemData]) => {
+        let value = `**Price:** ${itemData.price} coins`;
+
+        if (itemData.description) {
+          value += `\n**Description:** ${itemData.description}`;
+        }
+        if (itemData.role) {
+          value += `\n**Role:** <@&${itemData.role}>`;
+        }
+        if (itemData.inventory !== undefined) {
+          value += `\n**Inventory:** ${
+            itemData.inventory !== null
+              ? `${itemData.inventory} available`
+              : "Unlimited"
+          }`;
+        }
+        if (itemData.userLimit !== undefined) {
+          value += `\n**User Limit:** ${
+            itemData.userLimit !== null
+              ? `${itemData.userLimit} per user`
+              : "Unlimited"
+          }`;
+        }
+
         embed.addFields({
           name: itemName as string,
-          value: `**Price:** ${itemData.price} coins\n**Description:** ${
-            itemData.description || "No description provided."
-          }`,
+          value,
           inline: false,
         });
       });

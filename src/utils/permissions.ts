@@ -1,6 +1,6 @@
 import { GuildMember, PermissionsBitField } from "discord.js";
 
-import { ServerSettings } from "../database/enmap";
+import { ServerSettings } from "../database/enmap.js";
 
 /**
  * Checks if a member has admin permissions or a specified role for economy commands.

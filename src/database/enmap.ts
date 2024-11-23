@@ -11,10 +11,10 @@ import Enmap from "enmap";
 /**
  * UserData Enmap
  * Stores user-specific economy data, including balance, bank, inventory, and cooldowns.
- * 
- * **Key**: User ID (string)  
+ *
+ * **Key**: User ID (string)
  * **Value**: {@link UserDataSchema}
- * 
+ *
  * Example:
  * ```json
  * {
@@ -48,10 +48,10 @@ export const UserData = new Enmap({
 /**
  * ShopData Enmap
  * Stores items available for purchase in the shop.
- * 
- * **Key**: Item Name (string)  
+ *
+ * **Key**: Item Name (string)
  * **Value**: {@link ShopItemSchema}
- * 
+ *
  * Example:
  * ```json
  * {
@@ -69,25 +69,26 @@ export const ShopData = new Enmap({
 
 /**
  * @typedef {Object} ServerSettingsSchema
- * @property {boolean} economyEnabled - Whether the economy system is enabled for the server.
  * @property {number} dailyReward - The default amount of daily reward coins.
  * @property {number} weeklyReward - The default amount of weekly reward coins.
  * @property {string|null} adminRole - The name of the custom admin role for economy management (fallback: "Administrator").
+ * @property {string|null} logChannel - The ID of the channel to log actions to (fallback: null).
  */
 
 /**
  * ServerSettings Enmap
  * Stores per-server settings, including economy configurations and admin roles.
- * 
- * **Key**: Server ID (string)  
+ *
+ * **Key**: Server ID (string)
  * **Value**: {@link ServerSettingsSchema}
- * 
+ *
  * Example:
  * ```json
  * {
- *   "economyEnabled": true,
  *   "dailyReward": 100,
- *   "adminRole": "EconomyManager"
+ *   "weeklyReward": 500,
+ *   "adminRole": "EconomyManager",
+ *   "modlogChannel": "123456789012345678",
  * }
  * ```
  */
@@ -96,7 +97,12 @@ export const ServerSettings = new Enmap({
   ensureProps: true,
   fetchAll: true,
   dataDir: "./data",
-  autoEnsure: { economyEnabled: true, dailyReward: 100, weeklyReward: 500, adminRole: null },
+  autoEnsure: {
+    dailyReward: 100,
+    weeklyReward: 500,
+    adminRole: null,
+    modlogChannel: null,
+  },
 });
 
 /**
@@ -111,10 +117,10 @@ export const ServerSettings = new Enmap({
 /**
  * LogsData Enmap
  * Tracks admin actions for auditing and transparency purposes.
- * 
- * **Key**: Action ID (string)  
+ *
+ * **Key**: Action ID (string)
  * **Value**: {@link LogEntrySchema}
- * 
+ *
  * Example:
  * ```json
  * {
@@ -140,10 +146,10 @@ export const LogsData = new Enmap({
 /**
  * LeaderboardData Enmap
  * Stores derived leaderboard data based on user balances.
- * 
- * **Key**: Leaderboard ID (string)  
+ *
+ * **Key**: Leaderboard ID (string)
  * **Value**: {@link LeaderboardSchema}
- * 
+ *
  * Example:
  * ```json
  * [

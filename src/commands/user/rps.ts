@@ -1,9 +1,8 @@
 import { ApplicationCommandRegistry, Command } from "@sapphire/framework";
+import { ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 
-import { ChatInputCommandInteraction } from "discord.js";
-import { UserData } from "../../database/enmap";
-import { createEmbed } from "../../utils/embed";
-import { logAction } from "../../listeners/events";
+import { UserData } from "../../database/enmap.js";
+import { logAction } from "../../utils/events.js";
 
 export default class RPSCommand extends Command {
   constructor(context: Command.Context, options: Command.Options) {
@@ -39,10 +38,14 @@ export default class RPSCommand extends Command {
     );
   }
 
-  async chatInputRun(interaction: ChatInputCommandInteraction) {
+  async chatInputRun(interaction: ChatInputCommandInteraction): Promise<void> {
     const user = interaction.user;
-    const userChoice = interaction.options.getString("choice", true) as "rock" | "paper" | "scissors";
+    const userChoice = interaction.options.getString("choice", true) as
+      | "rock"
+      | "paper"
+      | "scissors";
     const betAmount = interaction.options.getInteger("amount", true);
+
     const userData = UserData.ensure(user.id, { balance: 0 });
 
     if (betAmount <= 0 || userData.balance < betAmount) {
@@ -53,55 +56,69 @@ export default class RPSCommand extends Command {
       return;
     }
 
+    // Emoji map for display
     const emojiMap: Record<"rock" | "paper" | "scissors", string> = {
       rock: "🪨 Rock",
       paper: "📄 Paper",
       scissors: "✂️ Scissors",
     };
 
-    const choices: ("rock" | "paper" | "scissors")[] = ["rock", "paper", "scissors"];
-    const botChoice = choices[Math.floor(Math.random() * choices.length)];
+    const outcomeWeights: {
+      outcome: "win" | "lose" | "draw";
+      weight: number;
+    }[] = [
+      { outcome: "win", weight: 30 },
+      { outcome: "lose", weight: 50 },
+      { outcome: "draw", weight: 20 },
+    ];
+    const outcome = this.weightedRandom(outcomeWeights);
 
+    // Determine bot's choice based on the desired outcome
+    const botChoice = this.calculateBotChoice(userChoice, outcome);
+
+    // Prepare result details
     let resultMessage = `🎮 You chose **${emojiMap[userChoice]}**\n🤖 Bot chose **${emojiMap[botChoice]}**\n\n`;
-
-    let resultColor;
+    let resultColor: number;
     let resultAmount = 0;
 
-    if (userChoice === botChoice) {
+    if (outcome === "draw") {
       resultMessage += "It's a draw!";
-      resultColor = 0xffd700;
-    } else if (
-      (userChoice === "rock" && botChoice === "scissors") ||
-      (userChoice === "scissors" && botChoice === "paper") ||
-      (userChoice === "paper" && botChoice === "rock")
-    ) {
+      resultColor = 0xffd700; // Gold
+    } else if (outcome === "win") {
       userData.balance += betAmount;
       resultMessage += `🎉 You won \`${betAmount} coins\`!`;
-      resultColor = 0x22c55e;
+      resultColor = 0x22c55e; // Green
       resultAmount = betAmount;
     } else {
       userData.balance -= betAmount;
       resultMessage += `💔 You lost \`${betAmount} coins\`.`;
-      resultColor = 0xf87171;
+      resultColor = 0xf87171; // Red
       resultAmount = -betAmount;
     }
 
+    // Update user's balance
     UserData.set(user.id, userData);
 
-    const embed = createEmbed({
-      title: "Rock-Paper-Scissors Result",
-      fields: [
+    // Build embed response
+    const embed = new EmbedBuilder()
+      .setTitle("Rock-Paper-Scissors Result")
+      .setColor(resultColor)
+      .setDescription(resultMessage)
+      .addFields(
         { name: "Your Choice", value: emojiMap[userChoice], inline: true },
         { name: "Bot Choice", value: emojiMap[botChoice], inline: true },
-        { name: "New Balance", value: `${userData.balance} coins`, inline: true },
-      ],
-      description: resultMessage,
-      color: resultColor,
-      timestamp: new Date(),
-    });
+        {
+          name: "New Balance",
+          value: `${userData.balance} coins`,
+          inline: true,
+        }
+      )
+      .setTimestamp();
 
+    // Reply to interaction
     await interaction.reply({ embeds: [embed] });
 
+    // Log the action
     await logAction(
       interaction.guildId || "",
       {
@@ -112,5 +129,49 @@ export default class RPSCommand extends Command {
       },
       interaction.client
     );
+  }
+
+  // Utility to pick a weighted random outcome
+  private weightedRandom(
+    weights: { outcome: "win" | "lose" | "draw"; weight: number }[]
+  ): "win" | "lose" | "draw" {
+    const totalWeight = weights.reduce((sum, w) => sum + w.weight, 0);
+    const random = Math.random() * totalWeight;
+
+    let cumulative = 0;
+    for (const { outcome, weight } of weights) {
+      cumulative += weight;
+      if (random <= cumulative) {
+        return outcome as "win" | "lose" | "draw";
+      }
+    }
+
+    // Fallback (shouldn't happen, but needed for type safety)
+    return "draw";
+  }
+
+  // Determine bot's choice based on user's choice and desired outcome
+  private calculateBotChoice(
+    userChoice: "rock" | "paper" | "scissors",
+    outcome: "win" | "lose" | "draw"
+  ): "rock" | "paper" | "scissors" {
+    const choiceMap: Record<
+      "rock" | "paper" | "scissors",
+      "rock" | "paper" | "scissors"
+    > = {
+      rock: "scissors",
+      paper: "rock",
+      scissors: "paper",
+    };
+
+    if (outcome === "win") {
+      return choiceMap[userChoice]; // Bot loses
+    } else if (outcome === "lose") {
+      return Object.keys(choiceMap).find(
+        (key) => choiceMap[key as "rock" | "paper" | "scissors"] === userChoice
+      ) as "rock" | "paper" | "scissors"; // Bot wins
+    } else {
+      return userChoice; // Draw
+    }
   }
 }

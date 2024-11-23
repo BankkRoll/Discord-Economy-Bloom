@@ -1,10 +1,10 @@
 import { ApplicationCommandRegistry, Command } from "@sapphire/framework";
 
 import { ChatInputCommandInteraction } from "discord.js";
-import { UserData } from "../../database/enmap";
-import { createEmbed } from "../../utils/embed";
-import { hasAdminOrRolePermission } from "../../utils/permissions";
-import { logAction } from "../../listeners/events";
+import { UserData } from "../../database/enmap.js";
+import { createEmbed } from "../../utils/embed.js";
+import { logAction } from "../../utils/events.js";
+import { hasAdminOrRolePermission } from "../../utils/permissions.js";
 
 export default class RemoveCoinsCommand extends Command {
   constructor(context: Command.Context, options: Command.Options) {

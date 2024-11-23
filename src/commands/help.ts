@@ -11,7 +11,7 @@ import {
 } from "discord.js";
 import { ApplicationCommandRegistry, Command } from "@sapphire/framework";
 
-import { hasAdminOrRolePermission } from "../utils/permissions";
+import { hasAdminOrRolePermission } from "../utils/permissions.js";
 
 type CommandCategory = {
   emoji: string;
@@ -102,16 +102,6 @@ export default class HelpCommand extends Command {
           name: "/rps",
           description: "Play rock-paper-scissors against the bot.",
         },
-        {
-          emoji: "🎡",
-          name: "/spinwheel",
-          description: "Spin the wheel for random rewards.",
-        },
-        {
-          emoji: "🎟️",
-          name: "/lottery-ticket",
-          description: "Buy and scratch a lottery ticket.",
-        },
       ],
       ...(isAdmin && {
         "🔧 Admin Commands": [
@@ -141,6 +131,11 @@ export default class HelpCommand extends Command {
             description: "Adds a new item to the shop.",
           },
           {
+            emoji: "🛍️",
+            name: "/viewitems",
+            description: "Adds a new item to the shop.",
+          },
+          {
             emoji: "❌",
             name: "/removeitem",
             description: "Removes an item from the shop.",
@@ -164,16 +159,6 @@ export default class HelpCommand extends Command {
             emoji: "📉",
             name: "/resetleaderboard",
             description: "Resets the leaderboard.",
-          },
-          {
-            emoji: "❎",
-            name: "/disableeconomy",
-            description: "Disables the economy system.",
-          },
-          {
-            emoji: "✅",
-            name: "/enableeconomy",
-            description: "Re-enables the economy system.",
           },
         ],
       }),

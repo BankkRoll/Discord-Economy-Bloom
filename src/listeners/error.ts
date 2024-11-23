@@ -1,6 +1,6 @@
 import { Events, Listener } from "@sapphire/framework";
 
-import { Logger } from "../utils/logger";
+import { Logger } from "../utils/logger.js";
 
 export class ErrorListener extends Listener {
   constructor(context: Listener.Context) {

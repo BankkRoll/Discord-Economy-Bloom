@@ -5,50 +5,24 @@ import {
   PermissionsBitField,
 } from "discord.js";
 
-import { ServerSettings } from "../../database/enmap";
-import { createEmbed } from "../../utils/embed";
+import { ServerSettings } from "../../database/enmap.js";
 
 export default class SetupCommand extends Command {
   constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
       name: "setup",
-      description: "Configure server settings for the bot (admin only).",
+      description: "Interactive server setup for bot configuration.",
     });
   }
 
   registerApplicationCommands(registry: ApplicationCommandRegistry) {
     registry.registerChatInputCommand((builder) =>
-      builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addStringOption((option) =>
-          option
-            .setName("action")
-            .setDescription("The setup action to perform.")
-            .setRequired(true)
-            .addChoices(
-              { name: "Set Admin Role", value: "admin_role" },
-              { name: "Enable Economy", value: "enable_economy" },
-              { name: "Disable Economy", value: "disable_economy" },
-              { name: "Set Daily Reward", value: "set_daily_reward" },
-              { name: "Set Weekly Reward", value: "set_weekly_reward" },
-              { name: "Set Modlog Channel", value: "set_modlog_channel" },
-              { name: "Set Action Log Channel", value: "set_actionlog_channel" }
-            )
-        )
-        .addStringOption((option) =>
-          option
-            .setName("value")
-            .setDescription(
-              "The value to set for the selected action (if applicable)."
-            )
-        )
+      builder.setName(this.name).setDescription(this.description)
     );
   }
 
-  async chatInputRun(interaction: ChatInputCommandInteraction) {
-    const user = interaction.user;
+  async chatInputRun(interaction: ChatInputCommandInteraction): Promise<void> {
     const guildId = interaction.guildId;
 
     if (
@@ -56,132 +30,167 @@ export default class SetupCommand extends Command {
         PermissionsBitField.Flags.Administrator
       )
     ) {
-      return interaction.reply({
+      await interaction.reply({
         content:
           "❌ You need to be a server administrator to use this command.",
         ephemeral: true,
       });
+      return;
     }
 
     if (!guildId) {
-      return interaction.reply({
+      await interaction.reply({
         content: "❌ This command can only be used in a server.",
         ephemeral: true,
       });
+      return;
     }
 
-    const action = interaction.options.getString("action", true);
-    const value = interaction.options.getString("value") || null;
-
+    // Ensure default server settings
     const settings = ServerSettings.ensure(guildId, {
-      economyEnabled: true,
       dailyReward: 100,
       weeklyReward: 500,
       adminRole: null,
       modlogChannel: null,
-      actionlogChannel: null,
     });
 
-    let responseMessage = "";
-    let embedColor = 0x22c55e;
+    const steps = [
+      {
+        key: "modlogChannel",
+        question:
+          "What channel should mod logs be sent to? Please tag the channel below.",
+      },
+      {
+        key: "adminRole",
+        question:
+          "What role should have admin privileges? Please tag the role below.",
+      },
+      {
+        key: "dailyReward",
+        question:
+          "What should the daily reward amount be? Please provide a positive number.",
+      },
+      {
+        key: "weeklyReward",
+        question:
+          "What should the weekly reward amount be? Please provide a positive number.",
+      },
+    ];
 
-    switch (action) {
-      case "admin_role":
-        if (!value) {
-          responseMessage = "❌ Please provide a role name for the admin role.";
-          embedColor = 0xf87171;
-          break;
-        }
-        settings.adminRole = value;
-        ServerSettings.set(guildId, settings);
-        responseMessage = `✅ Admin role has been set to \`${value}\`.`;
-        break;
+    let currentStep = 0;
 
-      case "enable_economy":
-        settings.economyEnabled = true;
-        ServerSettings.set(guildId, settings);
-        responseMessage = "✅ Economy system has been enabled for this server.";
-        break;
+    const createSetupEmbed = () => {
+      return {
+        title: "Server Setup",
+        description: "Follow the steps below to configure the bot settings.",
+        fields: [
+          {
+            name: "Modlog Channel",
+            value: settings.modlogChannel
+              ? `<#${settings.modlogChannel}>`
+              : "Not Set",
+            inline: true,
+          },
+          {
+            name: "Admin Role",
+            value: settings.adminRole ? `<@&${settings.adminRole}>` : "Not Set",
+            inline: true,
+          },
+          {
+            name: "Daily Reward",
+            value: `${settings.dailyReward} coins`,
+            inline: true,
+          },
+          {
+            name: "Weekly Reward",
+            value: `${settings.weeklyReward} coins`,
+            inline: true,
+          },
+        ],
+        footer: { text: `Step ${currentStep + 1} of ${steps.length}` },
+      };
+    };
 
-      case "disable_economy":
-        settings.economyEnabled = false;
-        ServerSettings.set(guildId, settings);
-        responseMessage =
-          "✅ Economy system has been disabled for this server.";
-        break;
+    const promptNextStep = async () => {
+      const step = steps[currentStep];
+      await interaction.editReply({
+        embeds: [{ ...createSetupEmbed(), color: 0x3498db }],
+        content: step.question,
+      });
+    };
 
-      case "set_daily_reward":
-        const dailyReward = parseInt(value || "", 10);
-        if (isNaN(dailyReward) || dailyReward <= 0) {
-          responseMessage =
-            "❌ Please provide a valid positive number for the daily reward.";
-          embedColor = 0xf87171;
-          break;
-        }
-        settings.dailyReward = dailyReward;
-        ServerSettings.set(guildId, settings);
-        responseMessage = `✅ Daily reward has been set to \`${dailyReward} coins\`.`;
-        break;
-
-      case "set_weekly_reward":
-        const weeklyReward = parseInt(value || "", 10);
-        if (isNaN(weeklyReward) || weeklyReward <= 0) {
-          responseMessage =
-            "❌ Please provide a valid positive number for the weekly reward.";
-          embedColor = 0xf87171;
-          break;
-        }
-        settings.weeklyReward = weeklyReward;
-        ServerSettings.set(guildId, settings);
-        responseMessage = `✅ Weekly reward has been set to \`${weeklyReward} coins\`.`;
-        break;
-
-      case "set_modlog_channel":
-        const modlogChannel = interaction.guild?.channels.cache.find(
-          (channel) => channel.name === value || channel.id === value
-        );
-        if (!modlogChannel || modlogChannel.type !== ChannelType.GuildText) {
-          responseMessage =
-            "❌ Please provide a valid text channel name or ID for the modlog.";
-          embedColor = 0xf87171;
-          break;
-        }
-        settings.modlogChannel = modlogChannel.id;
-        ServerSettings.set(guildId, settings);
-        responseMessage = `✅ Modlog channel has been set to <#${modlogChannel.id}>.`;
-        break;
-
-      case "set_actionlog_channel":
-        const actionlogChannel = interaction.guild?.channels.cache.find(
-          (channel) => channel.name === value || channel.id === value
-        );
-        if (
-          !actionlogChannel ||
-          actionlogChannel.type !== ChannelType.GuildText
-        ) {
-          responseMessage =
-            "❌ Please provide a valid text channel name or ID for the action log.";
-          embedColor = 0xf87171;
-          break;
-        }
-        settings.actionlogChannel = actionlogChannel.id;
-        ServerSettings.set(guildId, settings);
-        responseMessage = `✅ Action log channel has been set to <#${actionlogChannel.id}>.`;
-        break;
-
-      default:
-        responseMessage = "❌ Invalid action. Please select a valid option.";
-        embedColor = 0xf87171;
-        break;
-    }
-
-    const embed = createEmbed({
-      title: "Setup Result",
-      description: responseMessage,
-      color: embedColor,
-      timestamp: new Date(),
+    await interaction.reply({
+      embeds: [{ ...createSetupEmbed(), color: 0x3498db }],
+      content: steps[currentStep].question,
+      fetchReply: true,
     });
 
-    return interaction.reply({ embeds: [embed] });
+    const messageCollector = interaction.channel?.createMessageCollector({
+      filter: (m) => m.author.id === interaction.user.id,
+      time: 120000,
+    });
+
+    messageCollector?.on("collect", async (message) => {
+      const step = steps[currentStep];
+      let validInput = false;
+
+      if (step.key === "modlogChannel") {
+        const channel = message.mentions.channels.first();
+        if (channel && channel.type === ChannelType.GuildText) {
+          settings[step.key] = channel.id;
+          validInput = true;
+        } else {
+          await message.reply("❌ Please mention a valid text channel.");
+        }
+      } else if (step.key === "adminRole") {
+        const role = message.mentions.roles.first();
+        if (role) {
+          settings.adminRole = role.id;
+          validInput = true;
+        } else {
+          await message.reply("❌ Please mention a valid role.");
+        }
+      } else if (step.key === "dailyReward" || step.key === "weeklyReward") {
+        const amount = parseInt(message.content, 10);
+        if (!isNaN(amount) && amount > 0) {
+          settings[step.key] = amount;
+          validInput = true;
+        } else {
+          await message.reply("❌ Please provide a valid positive number.");
+        }
+      }
+
+      if (validInput) {
+        await message.delete();
+        ServerSettings.set(guildId, settings);
+        currentStep++;
+
+        if (currentStep < steps.length) {
+          await promptNextStep();
+        } else {
+          messageCollector.stop("completed");
+        }
+      }
+    });
+
+    messageCollector?.on("end", async (_, reason) => {
+      if (reason === "time") {
+        await interaction.editReply({
+          content:
+            "⏰ Setup timed out! Please run `/setup` again to complete the configuration.",
+          embeds: [],
+        });
+        return;
+      }
+
+      if (reason === "completed") {
+        await interaction.editReply({
+          content:
+            "✅ Setup completed successfully! Here are your server settings:",
+          embeds: [{ ...createSetupEmbed(), color: 0x22c55e }],
+        });
+        return;
+      }
+    });
   }
 }

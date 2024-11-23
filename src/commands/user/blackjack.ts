@@ -1,3 +1,4 @@
+import { ApplicationCommandRegistry, Command } from "@sapphire/framework";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -5,11 +6,10 @@ import {
   ChatInputCommandInteraction,
   ComponentType,
 } from "discord.js";
-import { ApplicationCommandRegistry, Command } from "@sapphire/framework";
 
-import { UserData } from "../../database/enmap";
-import { createEmbed } from "../../utils/embed";
-import { logAction } from "../../listeners/events";
+import { UserData } from "../../database/enmap.js";
+import { createEmbed } from "../../utils/embed.js";
+import { logAction } from "../../utils/events.js";
 
 export default class BlackjackCommand extends Command {
   constructor(context: Command.Context, options: Command.Options) {
@@ -48,22 +48,17 @@ export default class BlackjackCommand extends Command {
       return;
     }
 
-    let userHand = [this.drawCard(), this.drawCard()];
-    let dealerHand = [this.drawCard(), this.drawCard()];
+    const deck = this.createDeck();
+    let userHand = [this.drawCard(deck), this.drawCard(deck)];
+    let dealerHand = [this.drawCard(deck), this.drawCard(deck)];
     let userStand = false;
 
-    const calculateScore = (hand: string[]) => {
+    const calculateScore = (hand: { emoji: string; value: number }[]) => {
       let score = 0;
       let aces = 0;
       for (const card of hand) {
-        if (["K", "Q", "J"].includes(card)) {
-          score += 10;
-        } else if (card === "A") {
-          aces += 1;
-          score += 11;
-        } else {
-          score += parseInt(card);
-        }
+        score += card.value;
+        if (card.emoji.includes("🂡") || card.emoji.includes("🂱")) aces += 1;
       }
       while (score > 21 && aces > 0) {
         score -= 10;
@@ -72,20 +67,23 @@ export default class BlackjackCommand extends Command {
       return score;
     };
 
+    const formatHand = (hand: { emoji: string }[]) =>
+      hand.map((card) => card.emoji).join(" ");
+
     const createGameEmbed = (showDealer = false) => {
       return createEmbed({
         title: "Blackjack",
         fields: [
           {
             name: "Your Hand",
-            value: `${userHand.join(" ")} (Score: ${calculateScore(userHand)})`,
+            value: `${formatHand(userHand)} (Score: ${calculateScore(userHand)})`,
             inline: true,
           },
           {
             name: "Dealer's Hand",
             value: showDealer
-              ? `${dealerHand.join(" ")} (Score: ${calculateScore(dealerHand)})`
-              : `${dealerHand[0]} ❓`,
+              ? `${formatHand(dealerHand)} (Score: ${calculateScore(dealerHand)})`
+              : `${dealerHand[0].emoji} ❓`,
             inline: true,
           },
         ],
@@ -105,17 +103,18 @@ export default class BlackjackCommand extends Command {
         .setStyle(ButtonStyle.Secondary)
     );
 
-    await interaction.reply({
+    const replyMessage = await interaction.reply({
       embeds: [createGameEmbed()],
       components: [actionRow],
+      fetchReply: true,
     });
 
-    const collector = interaction.channel?.createMessageComponentCollector({
+    const collector = replyMessage.createMessageComponentCollector({
       componentType: ComponentType.Button,
       time: 60000,
     });
 
-    collector?.on("collect", async (buttonInteraction) => {
+    collector.on("collect", async (buttonInteraction) => {
       if (buttonInteraction.user.id !== user.id) {
         await buttonInteraction.reply({
           content: "This game isn't for you!",
@@ -125,8 +124,11 @@ export default class BlackjackCommand extends Command {
       }
 
       if (buttonInteraction.customId === "hit") {
-        userHand.push(this.drawCard());
-        if (calculateScore(userHand) > 21) {
+        userHand.push(this.drawCard(deck));
+
+        if (calculateScore(userHand) === 21) {
+          collector.stop("user_21");
+        } else if (calculateScore(userHand) > 21) {
           collector.stop("bust");
         }
       } else if (buttonInteraction.customId === "stand") {
@@ -142,24 +144,19 @@ export default class BlackjackCommand extends Command {
       }
     });
 
-    collector?.on("end", async (_, reason) => {
-      if (reason === "time") {
-        await interaction.followUp({
-          content: "⏰ Game timed out!",
-          ephemeral: true,
-        });
-        return;
-      }
-
+    collector.on("end", async (_, reason) => {
+      let resultMessage = "";
       while (calculateScore(dealerHand) < 17) {
-        dealerHand.push(this.drawCard());
+        dealerHand.push(this.drawCard(deck));
       }
 
       const userScore = calculateScore(userHand);
       const dealerScore = calculateScore(dealerHand);
-      let resultMessage = "";
 
-      if (reason === "bust" || userScore > 21) {
+      if (reason === "user_21") {
+        userData.balance += betAmount;
+        resultMessage = `🎉 Blackjack! You won \`${betAmount} coins\`!`;
+      } else if (reason === "bust" || userScore > 21) {
         userData.balance -= betAmount;
         resultMessage = "💔 You busted and lost your bet!";
       } else if (dealerScore > 21 || userScore > dealerScore) {
@@ -178,10 +175,12 @@ export default class BlackjackCommand extends Command {
         .setTitle("Blackjack - Game Over")
         .setDescription(resultMessage)
         .setColor(
-          userScore > 21 || dealerScore > userScore ? 0xf87171 : 0x22c55e
+          reason === "user_21" || dealerScore > 21 || userScore > dealerScore
+            ? 0x22c55e
+            : 0xf87171
         );
 
-      await interaction.followUp({ embeds: [resultEmbed], components: [] });
+      await interaction.editReply({ embeds: [resultEmbed], components: [] });
 
       await logAction(
         interaction.guildId || "",
@@ -189,30 +188,89 @@ export default class BlackjackCommand extends Command {
           user: user.id,
           action: "blackjack",
           amount:
-            userScore > 21 || dealerScore > userScore ? -betAmount : betAmount,
-          description: `User ${userScore > 21 || dealerScore > userScore ? "lost" : "won"} ${betAmount} coins in Blackjack.`,
+            reason === "user_21" || dealerScore > 21 || userScore > dealerScore
+              ? betAmount
+              : -betAmount,
+          description: `User ${
+            reason === "user_21" || dealerScore > 21 || userScore > dealerScore
+              ? "won"
+              : "lost"
+          } ${betAmount} coins in Blackjack.`,
         },
         client
       );
     });
   }
 
-  drawCard() {
-    const cards = [
-      "A",
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "7",
-      "8",
-      "9",
-      "10",
-      "J",
-      "Q",
-      "K",
+  drawCard(deck: { emoji: string; value: number }[]): {
+    emoji: string;
+    value: number;
+  } {
+    return deck.splice(Math.floor(Math.random() * deck.length), 1)[0];
+  }
+
+  createDeck() {
+    return [
+      // Spades
+      { emoji: "🂡", value: 11 }, // Ace of Spades
+      { emoji: "🂢", value: 2 },
+      { emoji: "🂣", value: 3 },
+      { emoji: "🂤", value: 4 },
+      { emoji: "🂥", value: 5 },
+      { emoji: "🂦", value: 6 },
+      { emoji: "🂧", value: 7 },
+      { emoji: "🂨", value: 8 },
+      { emoji: "🂩", value: 9 },
+      { emoji: "🂪", value: 10 },
+      { emoji: "🂫", value: 10 }, // Jack of Spades
+      { emoji: "🂭", value: 10 }, // Queen of Spades
+      { emoji: "🂮", value: 10 }, // King of Spades
+
+      // Hearts
+      { emoji: "🂱", value: 11 }, // Ace of Hearts
+      { emoji: "🂲", value: 2 },
+      { emoji: "🂳", value: 3 },
+      { emoji: "🂴", value: 4 },
+      { emoji: "🂵", value: 5 },
+      { emoji: "🂶", value: 6 },
+      { emoji: "🂷", value: 7 },
+      { emoji: "🂸", value: 8 },
+      { emoji: "🂹", value: 9 },
+      { emoji: "🂺", value: 10 },
+      { emoji: "🂻", value: 10 }, // Jack of Hearts
+      { emoji: "🂽", value: 10 }, // Queen of Hearts
+      { emoji: "🂾", value: 10 }, // King of Hearts
+
+      // Diamonds
+      { emoji: "🃁", value: 11 }, // Ace of Diamonds
+      { emoji: "🃂", value: 2 },
+      { emoji: "🃃", value: 3 },
+      { emoji: "🃄", value: 4 },
+      { emoji: "🃅", value: 5 },
+      { emoji: "🃆", value: 6 },
+      { emoji: "🃇", value: 7 },
+      { emoji: "🃈", value: 8 },
+      { emoji: "🃉", value: 9 },
+      { emoji: "🃊", value: 10 },
+      { emoji: "🃋", value: 10 }, // Jack of Diamonds
+      { emoji: "🃍", value: 10 }, // Queen of Diamonds
+      { emoji: "🃎", value: 10 }, // King of Diamonds
+
+      // Clubs
+      { emoji: "🃑", value: 11 }, // Ace of Clubs
+      { emoji: "🃒", value: 2 },
+      { emoji: "🃓", value: 3 },
+      { emoji: "🃔", value: 4 },
+      { emoji: "🃕", value: 5 },
+      { emoji: "🃖", value: 6 },
+      { emoji: "🃗", value: 7 },
+      { emoji: "🃘", value: 8 },
+      { emoji: "🃙", value: 9 },
+      { emoji: "🃚", value: 10 },
+      { emoji: "🃛", value: 10 }, // Jack of Clubs
+      { emoji: "🃝", value: 10 }, // Queen of Clubs
+      { emoji: "🃞", value: 10 }, // King of Clubs
+      // Repeat for other suits (Hearts, Diamonds, Clubs)...
     ];
-    return cards[Math.floor(Math.random() * cards.length)];
   }
 }

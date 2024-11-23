@@ -1,9 +1,10 @@
-import { ApplicationCommandRegistry, Command } from "@sapphire/framework";
+// src/commands/user/slots.ts
 
-import { ChatInputCommandInteraction } from "discord.js";
-import { UserData } from "../../database/enmap";
-import { createEmbed } from "../../utils/embed";
-import { logAction } from "../../listeners/events";
+import { ApplicationCommandRegistry, Command } from "@sapphire/framework";
+import { ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
+
+import { UserData } from "../../database/enmap.js";
+import { logAction } from "../../utils/events.js";
 
 export default class SlotsCommand extends Command {
   constructor(context: Command.Context, options: Command.Options) {
@@ -28,9 +29,11 @@ export default class SlotsCommand extends Command {
     );
   }
 
-  async chatInputRun(interaction: ChatInputCommandInteraction) {
+  async chatInputRun(interaction: ChatInputCommandInteraction): Promise<void> {
     const user = interaction.user;
     const amount = interaction.options.getInteger("amount", true);
+
+    // Ensure user data exists and is type-safe
     const userData = UserData.ensure(user.id, { balance: 0 });
 
     if (amount <= 0 || userData.balance < amount) {
@@ -41,8 +44,18 @@ export default class SlotsCommand extends Command {
       return;
     }
 
-    const symbols = ["🍒", "🍋", "🍊", "🍇", "🔔", "⭐", "💎"];
-    const grid = Array(3)
+    // Symbol payout multipliers (ascending in value)
+    const symbols: { emoji: string; multiplier: number }[] = [
+      { emoji: "🍋", multiplier: 2 },
+      { emoji: "🍊", multiplier: 3 },
+      { emoji: "🍇", multiplier: 4 },
+      { emoji: "🍒", multiplier: 5 },
+      { emoji: "⭐", multiplier: 10 },
+      { emoji: "💎", multiplier: 20 },
+    ];
+
+    // Generate a 3x3 grid of random symbols
+    const grid: { emoji: string; multiplier: number }[][] = Array(3)
       .fill(null)
       .map(() =>
         Array(3)
@@ -50,74 +63,103 @@ export default class SlotsCommand extends Command {
           .map(() => symbols[Math.floor(Math.random() * symbols.length)])
       );
 
-    const formatSlotMachine = (grid: string[][]) => {
-      const topBorder = "╭─────────────╮";
-      const bottomBorder = "╰─────────────╯";
+    // Format the slot machine grid
+    const formatSlotMachine = (grid: { emoji: string }[][]): string => {
+      const topBorder = "╭───────────────╮";
+      const bottomBorder = "╰───────────────╯";
       const rows = grid
-        .map((row) => `│ ${row.map((symbol) => `${symbol}`).join(" | ")} │`)
+        .map((row) => `│ ${row.map((symbol) => symbol.emoji).join(" | ")} │`)
         .join("\n");
       return `${topBorder}\n${rows}\n${bottomBorder}`;
     };
 
     const slotMachine = formatSlotMachine(grid);
 
-    const hasJackpot =
-      grid[0][0] === grid[1][1] &&
-      grid[1][1] === grid[2][2] &&
-      grid[0][0] === grid[2][0]; // Diagonal and center match
+    // Calculate winnings and track hits
+    const hits: string[] = [];
+    let totalWinnings = 0;
 
-    const isWinning =
-      hasJackpot ||
-      grid.some((row) => row.every((symbol) => symbol === row[0])) || // Rows
-      [0, 1, 2].some((col) => grid.every((row) => row[col] === grid[0][col])); // Columns
+    const checkMatch = (line: { multiplier: number }[]): boolean =>
+      line.every((symbol) => symbol.multiplier === line[0].multiplier);
 
-    const winnings = isWinning ? amount * (hasJackpot ? 20 : 5) : 0;
+    // Check rows
+    for (const row of grid) {
+      if (checkMatch(row)) {
+        totalWinnings += amount * row[0].multiplier;
+        hits.push(`${row[0].emoji} ×3 (Row)`);
+      }
+    }
 
-    if (winnings > 0) {
-      userData.balance += winnings;
+    // Check columns
+    for (let col = 0; col < 3; col++) {
+      const column = grid.map((row) => row[col]);
+      if (checkMatch(column)) {
+        totalWinnings += amount * column[0].multiplier;
+        hits.push(`${column[0].emoji} ×3 (Column)`);
+      }
+    }
+
+    // Check diagonals
+    const mainDiagonal = [grid[0][0], grid[1][1], grid[2][2]];
+    const antiDiagonal = [grid[0][2], grid[1][1], grid[2][0]];
+    if (checkMatch(mainDiagonal)) {
+      totalWinnings += amount * mainDiagonal[0].multiplier * 2; // Bonus for diagonals
+      hits.push(`${mainDiagonal[0].emoji} ×3 (Diagonal)`);
+    }
+    if (checkMatch(antiDiagonal)) {
+      totalWinnings += amount * antiDiagonal[0].multiplier * 2;
+      hits.push(`${antiDiagonal[0].emoji} ×3 (Diagonal)`);
+    }
+
+    // Update user balance
+    if (totalWinnings > 0) {
+      userData.balance += totalWinnings;
     } else {
       userData.balance -= amount;
     }
-
     UserData.set(user.id, userData);
 
-    const embed = createEmbed({
-      title: "🎰 Slot Machine 🎰",
-      description: `\`\`\`\n${slotMachine}\n\`\`\``,
-      color: winnings > 0 ? 0x22c55e : 0xf87171,
-      fields: [
+    // Prepare embed
+    const embed = new EmbedBuilder()
+      .setTitle("🎰 Slot Machine 🎰")
+      .setColor(totalWinnings > 0 ? 0x22c55e : 0xf87171)
+      .setDescription(
+        totalWinnings > 0
+          ? `🎉 **You Won!** 🎉\n\`\`\`\n${slotMachine}\n\`\`\`\nYou won **${totalWinnings} coins**!`
+          : `💔 **Better Luck Next Time!** 💔\n\`\`\`\n${slotMachine}\n\`\`\`\nYou lost **${amount} coins**.`
+      )
+      .addFields(
         { name: "Bet Amount", value: `${amount} coins`, inline: true },
-        { name: "Winnings", value: `${winnings} coins`, inline: true },
+        { name: "Winnings", value: `${totalWinnings} coins`, inline: true },
         {
           name: "New Balance",
           value: `${userData.balance} coins`,
           inline: true,
-        },
-      ],
-      timestamp: new Date(),
-    });
+        }
+      )
+      .setTimestamp();
 
-    if (winnings > 0) {
-      embed.setDescription(
-        `🎉 **You Won!** 🎉\n\`\`\`\n${slotMachine}\n\`\`\`\nYou won **${winnings} coins**!`
-      );
-    } else {
-      embed.setDescription(
-        `💔 **Better Luck Next Time!** 💔\n\`\`\`\n${slotMachine}\n\`\`\`\nYou lost **${amount} coins**.`
-      );
+    // Add hit details if there are any
+    if (hits.length > 0) {
+      embed.addFields({
+        name: "Hits",
+        value: hits.join("\n"),
+        inline: false,
+      });
     }
 
     await interaction.reply({ embeds: [embed] });
 
+    // Log action
     await logAction(
       interaction.guildId || "",
       {
         user: user.id,
         action: "slots",
-        amount: winnings > 0 ? winnings : -amount,
+        amount: totalWinnings > 0 ? totalWinnings : -amount,
         description:
-          winnings > 0
-            ? `User won ${winnings} coins in slots.`
+          totalWinnings > 0
+            ? `User won ${totalWinnings} coins in slots.`
             : `User lost ${amount} coins in slots.`,
       },
       interaction.client

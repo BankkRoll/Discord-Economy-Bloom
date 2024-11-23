@@ -1,9 +1,9 @@
 import { ApplicationCommandRegistry, Command } from "@sapphire/framework";
-import { ServerSettings, UserData } from "../../database/enmap";
+import { ServerSettings, UserData } from "../../database/enmap.js";
 
 import { ChatInputCommandInteraction } from "discord.js";
-import { createEmbed } from "../../utils/embed";
-import { logAction } from "../../listeners/events";
+import { createEmbed } from "../../utils/embed.js";
+import { logAction } from "../../utils/events.js";
 
 export default class WeeklyCommand extends Command {
   constructor(context: Command.Context, options: Command.Options) {

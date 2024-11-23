@@ -3,7 +3,7 @@
 import { ApplicationCommandRegistry, Command } from "@sapphire/framework";
 
 import { ChatInputCommandInteraction } from "discord.js";
-import { createEmbed } from "../utils/embed";
+import { createEmbed } from "../utils/embed.js";
 
 export default class PingCommand extends Command {
   constructor(context: Command.Context, options: Command.Options) {
