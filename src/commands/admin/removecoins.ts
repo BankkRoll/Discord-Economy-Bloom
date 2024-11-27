@@ -73,7 +73,11 @@ export default class RemoveCoinsCommand extends Command {
       fields: [
         { name: "User", value: `<@${user.id}>`, inline: true },
         { name: "Amount", value: `${amount}`, inline: true },
-        { name: "Remaining Balance", value: `${userData.balance}`, inline: true },
+        {
+          name: "Remaining Balance",
+          value: `${userData.balance}`,
+          inline: true,
+        },
       ],
       color: 0xff5555,
       timestamp: new Date(),

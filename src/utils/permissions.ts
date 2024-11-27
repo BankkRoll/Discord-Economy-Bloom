@@ -20,6 +20,7 @@ export function hasAdminOrRolePermission(
 
   return (
     member.permissions.has(PermissionsBitField.Flags.Administrator) ||
-    (adminRoleName && member.roles.cache.some((role) => role.name === adminRoleName))
+    (adminRoleName &&
+      member.roles.cache.some((role) => role.name === adminRoleName))
   );
 }

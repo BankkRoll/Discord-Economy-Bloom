@@ -16,7 +16,7 @@ export default class DailyCommand extends Command {
 
   registerApplicationCommands(registry: ApplicationCommandRegistry) {
     registry.registerChatInputCommand((builder) =>
-      builder.setName(this.name).setDescription(this.description)
+      builder.setName(this.name).setDescription(this.description),
     );
   }
 
@@ -48,7 +48,11 @@ export default class DailyCommand extends Command {
       description: `🎉 You've received \`${dailyReward} coins\`!`,
       fields: [
         { name: "Reward", value: `${dailyReward} coins`, inline: true },
-        { name: "New Balance", value: `${userData.balance} coins`, inline: true },
+        {
+          name: "New Balance",
+          value: `${userData.balance} coins`,
+          inline: true,
+        },
       ],
       color: 0x22c55e,
       timestamp: new Date(),
@@ -64,7 +68,7 @@ export default class DailyCommand extends Command {
         amount: dailyReward,
         description: `User claimed daily reward of ${dailyReward} coins.`,
       },
-      interaction.client
+      interaction.client,
     );
   }
 }

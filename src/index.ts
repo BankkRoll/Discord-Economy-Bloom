@@ -5,6 +5,15 @@ import { ActivityType, GatewayIntentBits } from "discord.js";
 
 import { Logger } from "./utils/logger.js";
 import { SapphireClient } from "@sapphire/framework";
+import fs from "fs";
+import path from "path";
+
+const dataFolderPath = path.resolve("./data");
+
+if (!fs.existsSync(dataFolderPath)) {
+  fs.mkdirSync(dataFolderPath);
+  Logger.info(`Created missing directory: ${dataFolderPath}`);
+}
 
 const client = new SapphireClient({
   intents: [
@@ -13,6 +22,7 @@ const client = new SapphireClient({
     GatewayIntentBits.GuildMessages,
   ],
   loadMessageCommandListeners: true,
+  loadDefaultErrorListeners: true,
 });
 
 client
@@ -30,31 +40,24 @@ client
 
 function setDynamicActivity() {
   const activities = [
-    {
-      type: ActivityType.Playing,
-      name: `with ${client.guilds.cache.size} servers on DeployNow`,
-    },
-    {
-      type: ActivityType.Listening,
-      name: `to feedback from ${client.users.cache.size} users`,
-    },
+    { type: ActivityType.Playing, name: "🎰 Slots for big rewards!" },
+    { type: ActivityType.Competing, name: "🃏 Blackjack with high stakes!" },
+    { type: ActivityType.Playing, name: "✂️ Rock-paper-scissors for coins!" },
+    { type: ActivityType.Playing, name: `🪙 Flipping coins for luck.` },
+    { type: ActivityType.Competing, name: `💼 Working to earn coins!` },
     {
       type: ActivityType.Watching,
-      name: `over ${client.channels.cache.size} channels`,
-    },
-    {
-      type: ActivityType.Competing,
-      name: `in ${client.guilds.cache.size} server challenges`,
+      name: `🛠️ Managing ${client.guilds.cache.size} servers`,
     },
   ];
 
-  let index = 0;
-
   setInterval(() => {
-    const activity = activities[index % activities.length];
-    client.user?.setActivity(activity.name, { type: activity.type });
-    index++;
-  }, 10000);
+    const randomActivity =
+      activities[Math.floor(Math.random() * activities.length)];
+    client.user?.setActivity(randomActivity.name, {
+      type: randomActivity.type,
+    });
+  }, 60000);
 }
 
 export default client;

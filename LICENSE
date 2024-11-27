@@ -1,48 +1,125 @@
-# Bloom License v1.0
+# DeployNow Software License Agreement (v1.0)
 
-Copyright (c) 2024, DeployNow
+## PREAMBLE
 
-### Terms and Conditions for Use, Reproduction, and Distribution:
+This License Agreement ("Agreement") is between DeployNow ("Licensor") and the Licensee ("You"), governing the use of DeployNow's software templates, including but not limited to Aspire, Bloom, Charm, Destiny, Emerald, and any future products.
 
-#### 1. Definitions
-- **"Software"** refers to the Bloom - Economy Discord Bot, including all files, code, and associated documentation, provided as part of the original download or obtained from authorized sources.  
-- **"You" (or **"Your"**)** refers to the licensee who has lawfully purchased the Software.  
-- **"Redistribution"** refers to the act of sharing, selling, or distributing the Software in its original form.
+### 1. DEFINITIONS
+
+1.1 **"Software"** encompasses all DeployNow product templates, including:
+- Websites
+- SaaS Platforms
+- Discord Bots
+- Bot Dashboards
+- Ecom Sites
+- Associated documentation, code, and all other resources
+
+1.2 **"Commercial Use"** includes any project generating revenue or used in a business context.
+
+### 2. LICENSE GRANT
+
+2.1 **Usage Rights**
+Licensor grants a worldwide, non-exclusive license to:
+- Use the Software for personal and commercial projects
+- Modify and adapt the Software for internal and external purposes
+- Deploy the Software in private and commercial environments
+- Create derivative works with substantial modifications
+
+2.2 **Deployment Flexibility**
+- Unlimited project deployments
+- No geographical restrictions
+- Perpetual usage rights for purchased templates
+
+### 3. COMMERCIAL PERMISSIONS
+
+3.1 Commercial Usage Allowances:
+- Create commercial products using the template
+- Sell products built with the template
+- White-label and rebrand derivative works
+- No royalty or additional licensing fees required
+
+3.2 Restrictions:
+- Cannot resell the original template as-is
+- Cannot create direct template competitors
+- Must maintain original copyright notices in derivatives
+
+### 4. INTELLECTUAL PROPERTY
+
+4.1 Ownership
+- Original template IP remains with DeployNow
+- Derivative works' unique additions are owned by the creator
+- No transfer of core template ownership occurs
+
+4.2 Attribution
+- Optional but appreciated attribution to DeployNow
+- No mandatory branding requirements
+- Creators can fully customize and white-label products
+
+### 6. WARRANTY & LIABILITY
+
+6.1 Software is provided "as-is" with:
+- No explicit performance guarantees
+- No warranty for compatibility
+- Limited liability for potential issues
+
+6.2 Licensee Responsibilities:
+- Verify template suitability
+- Implement necessary security measures
+- Conduct thorough testing before production use
+
+### 7. SUPPORT & UPDATES
+
+7.1 Support Tiers:
+- Basic community support included
+- Optional paid premium support available
+- Documentation and resources provided
+
+7.2 Update Policy:
+- Free lifetime version updates
+
+### 8. TERMINATION
+
+8.1 License Termination Conditions:
+- Violation of commercial resale restrictions
+- Intentional IP infringement
+- Fraudulent use of templates
+
+8.2 Termination Effects:
+- Immediate cessation of template usage
+- Removal of deployed instances
+- Potential legal action for significant violations
+
+### 9. COMPLIANCE & AUDITING
+
+9.1 Compliance Requirements:
+- Maintain accurate usage records
+- Permit potential compliance reviews
+- Promptly address any identified issues
+
+### 10. LEGAL JURISDICTION
+
+10.1 Governing Law:
+- United States
+- Arbitration for dispute resolution
+- International usage subject to local regulations
+
+### 11. SPECIAL PROVISIONS
+
+11.1 Lifetime Access Benefits:
+- Access to all current and future templates
+- Early access to beta features
+- Exclusive community resources
+
+### 12. CONTACT & COMMUNICATION
+
+For licensing inquiries, support, or clarifications:
+- Email: licensing@deploynow.com
+- Website: https://deploynow.com/license
+- Discord: DeployNow Official Support Channel
 
 ---
 
-#### 2. Grant of License
-Subject to the terms and conditions of this License, the copyright holder grants You a worldwide, non-exclusive, non-transferable, and perpetual license to:
-1. Use the Software for personal and commercial projects.
-2. Modify the Software for Your own use.
-3. Create derivative works based on the Software for internal use.
+**Effective Date**: November 2024
+**Version**: 1.0
 
----
-
-#### 3. Restrictions
-You may **NOT**:
-1. Redistribute, sublicense, sell, or share the Software in its original or modified form, either as a standalone product or as part of a collection or template.
-2. Use the Software to create a competing product or template for sale or public distribution.
-3. Share access to the Software in online repositories, open-source platforms, forums, or similar public channels.
-
----
-
-#### 4. Attribution
-This Software may be used in personal and commercial projects without attribution unless otherwise specified in a separate agreement.
-
----
-
-#### 5. Disclaimer of Warranty
-The Software is provided "as is," without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and non-infringement. In no event shall the copyright holder or contributors be liable for any claim, damages, or other liability arising from the use of the Software.
-
----
-
-#### 6. Termination
-This License is automatically terminated if You violate any of the terms outlined in Section 3. Upon termination, You must immediately cease using the Software and destroy any copies in Your possession.
-
----
-
-#### 7. Governing Law
-This License shall be governed by and construed in accordance with the laws of [Your Country/State]. Any disputes arising under or in connection with this License shall be subject to the exclusive jurisdiction of the courts of [Your Country/State].
-
----
+© 2024 DeployNow. All Rights Reserved.

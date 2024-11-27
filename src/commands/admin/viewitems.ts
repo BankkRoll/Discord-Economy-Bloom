@@ -23,7 +23,7 @@ export default class ViewItemsCommand extends Command {
 
   registerApplicationCommands(registry: ApplicationCommandRegistry) {
     registry.registerChatInputCommand((builder) =>
-      builder.setName(this.name).setDescription(this.description)
+      builder.setName(this.name).setDescription(this.description),
     );
   }
 
@@ -108,7 +108,7 @@ export default class ViewItemsCommand extends Command {
           .setCustomId("next")
           .setLabel("Next")
           .setStyle(ButtonStyle.Primary)
-          .setDisabled(currentPage === pages - 1)
+          .setDisabled(currentPage === pages - 1),
       );
       return buttons;
     };

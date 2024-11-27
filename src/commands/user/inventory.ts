@@ -39,7 +39,10 @@ export default class InventoryCommand extends Command {
     }
 
     const inventoryList = userData.inventory
-      .map((item: { item: string; quantity: number }) => `**${item.item}** - \`${item.quantity}\``)
+      .map(
+        (item: { item: string; quantity: number }) =>
+          `**${item.item}** - \`${item.quantity}\``,
+      )
       .join("\n");
 
     const embed = createEmbed({

@@ -10,7 +10,7 @@ import Enmap from "enmap";
 
 /**
  * UserData Enmap
- * Stores user-specific economy data, including balance, bank, inventory, and cooldowns.
+ * Stores user-specific economy data, including balance, inventory, and cooldowns.
  *
  * **Key**: User ID (string)
  * **Value**: {@link UserDataSchema}
@@ -19,7 +19,6 @@ import Enmap from "enmap";
  * ```json
  * {
  *   "balance": 1000,
- *   "bank": 500,
  *   "inventory": [
  *     { "item": "Golden Sword", "quantity": 1 },
  *     { "item": "Shield", "quantity": 2 }
@@ -36,7 +35,7 @@ export const UserData = new Enmap({
   ensureProps: true,
   fetchAll: true,
   dataDir: "./data",
-  autoEnsure: { balance: 0, bank: 0, inventory: [], cooldowns: {} },
+  autoEnsure: { balance: 0, inventory: [], cooldowns: {} },
 });
 
 /**

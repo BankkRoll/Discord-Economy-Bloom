@@ -24,8 +24,8 @@ export default class SlotsCommand extends Command {
           option
             .setName("amount")
             .setDescription("The amount of coins to bet.")
-            .setRequired(true)
-        )
+            .setRequired(true),
+        ),
     );
   }
 
@@ -60,7 +60,7 @@ export default class SlotsCommand extends Command {
       .map(() =>
         Array(3)
           .fill(null)
-          .map(() => symbols[Math.floor(Math.random() * symbols.length)])
+          .map(() => symbols[Math.floor(Math.random() * symbols.length)]),
       );
 
     // Format the slot machine grid
@@ -126,7 +126,7 @@ export default class SlotsCommand extends Command {
       .setDescription(
         totalWinnings > 0
           ? `🎉 **You Won!** 🎉\n\`\`\`\n${slotMachine}\n\`\`\`\nYou won **${totalWinnings} coins**!`
-          : `💔 **Better Luck Next Time!** 💔\n\`\`\`\n${slotMachine}\n\`\`\`\nYou lost **${amount} coins**.`
+          : `💔 **Better Luck Next Time!** 💔\n\`\`\`\n${slotMachine}\n\`\`\`\nYou lost **${amount} coins**.`,
       )
       .addFields(
         { name: "Bet Amount", value: `${amount} coins`, inline: true },
@@ -135,7 +135,7 @@ export default class SlotsCommand extends Command {
           name: "New Balance",
           value: `${userData.balance} coins`,
           inline: true,
-        }
+        },
       )
       .setTimestamp();
 
@@ -162,7 +162,7 @@ export default class SlotsCommand extends Command {
             ? `User won ${totalWinnings} coins in slots.`
             : `User lost ${amount} coins in slots.`,
       },
-      interaction.client
+      interaction.client,
     );
   }
 }

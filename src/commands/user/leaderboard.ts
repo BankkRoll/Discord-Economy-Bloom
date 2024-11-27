@@ -22,7 +22,7 @@ export default class LeaderboardCommand extends Command {
 
   registerApplicationCommands(registry: ApplicationCommandRegistry) {
     registry.registerChatInputCommand((builder) =>
-      builder.setName(this.name).setDescription(this.description)
+      builder.setName(this.name).setDescription(this.description),
     );
   }
 
@@ -91,7 +91,7 @@ export default class LeaderboardCommand extends Command {
           .setCustomId("next")
           .setLabel("Next")
           .setStyle(ButtonStyle.Primary)
-          .setDisabled(currentPage === totalPages - 1)
+          .setDisabled(currentPage === totalPages - 1),
       );
     };
 

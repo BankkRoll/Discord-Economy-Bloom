@@ -30,14 +30,14 @@ export default class HelpCommand extends Command {
 
   registerApplicationCommands(registry: ApplicationCommandRegistry) {
     registry.registerChatInputCommand((builder) =>
-      builder.setName(this.name).setDescription(this.description)
+      builder.setName(this.name).setDescription(this.description),
     );
   }
 
   async chatInputRun(interaction: ChatInputCommandInteraction) {
     const isAdmin = hasAdminOrRolePermission(
       interaction.guild?.members.cache.get(interaction.user.id),
-      interaction.guildId
+      interaction.guildId,
     );
 
     const categories: Record<string, CommandCategory[]> = {
@@ -61,11 +61,6 @@ export default class HelpCommand extends Command {
           emoji: "🛠️",
           name: "/work",
           description: "Earn coins by completing a task.",
-        },
-        {
-          emoji: "🛒",
-          name: "/buy",
-          description: "Buy an item from the shop.",
         },
         {
           emoji: "📜",
@@ -155,11 +150,6 @@ export default class HelpCommand extends Command {
             name: "/resetinventory",
             description: "Clears a user's inventory.",
           },
-          {
-            emoji: "📉",
-            name: "/resetleaderboard",
-            description: "Resets the leaderboard.",
-          },
         ],
       }),
     };
@@ -174,13 +164,13 @@ export default class HelpCommand extends Command {
         new StringSelectMenuBuilder()
           .setCustomId("help-menu")
           .setPlaceholder("Select a command category")
-          .addOptions(menuOptions)
+          .addOptions(menuOptions),
       );
 
     const mainEmbed = new EmbedBuilder()
       .setTitle("Help Menu")
       .setDescription(
-        "Use the dropdown menu below to explore available commands."
+        "Use the dropdown menu below to explore available commands.",
       )
       .setColor(0x3498db);
 
@@ -190,7 +180,7 @@ export default class HelpCommand extends Command {
           .setCustomId("help-back")
           .setLabel("Back")
           .setStyle(ButtonStyle.Primary)
-          .setDisabled(true)
+          .setDisabled(true),
       );
 
     const response = await interaction.reply({
@@ -225,7 +215,7 @@ export default class HelpCommand extends Command {
           embeds: [categoryEmbed],
           components: [selectMenu],
         });
-      }
+      },
     );
 
     collector.on("end", async () => {
@@ -235,7 +225,7 @@ export default class HelpCommand extends Command {
             .setCustomId("help-menu-disabled")
             .setPlaceholder("Menu expired")
             .setDisabled(true)
-            .addOptions(menuOptions)
+            .addOptions(menuOptions),
         );
 
       await interaction.editReply({ components: [disabledMenu] });

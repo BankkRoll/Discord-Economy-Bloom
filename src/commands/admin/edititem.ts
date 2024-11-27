@@ -28,42 +28,42 @@ export default class EditItemCommand extends Command {
           option
             .setName("item")
             .setDescription("The name of the item to edit.")
-            .setRequired(true)
+            .setRequired(true),
         )
         .addIntegerOption((option) =>
           option
             .setName("new_price")
-            .setDescription("The new price of the item.")
+            .setDescription("The new price of the item."),
         )
         .addStringOption((option) =>
           option
             .setName("new_description")
-            .setDescription("The new description of the item.")
+            .setDescription("The new description of the item."),
         )
         .addRoleOption((option) =>
           option
             .setName("new_role")
-            .setDescription("The new role to be granted with the item.")
+            .setDescription("The new role to be granted with the item."),
         )
         .addStringOption((option) =>
           option
             .setName("new_image_url")
-            .setDescription("The new image URL for the item.")
+            .setDescription("The new image URL for the item."),
         )
         .addIntegerOption((option) =>
           option
             .setName("new_inventory")
             .setDescription(
-              "The new inventory limit (total items available). Use 0 for unlimited."
-            )
+              "The new inventory limit (total items available). Use 0 for unlimited.",
+            ),
         )
         .addIntegerOption((option) =>
           option
             .setName("new_user_limit")
             .setDescription(
-              "The new purchase limit per user. Use 0 for unlimited."
-            )
-        )
+              "The new purchase limit per user. Use 0 for unlimited.",
+            ),
+        ),
     );
   }
 
@@ -77,7 +77,7 @@ export default class EditItemCommand extends Command {
     const newUserLimit = interaction.options.getInteger("new_user_limit");
 
     const member = interaction.guild?.members.cache.get(
-      interaction.user.id
+      interaction.user.id,
     ) as GuildMember;
     if (!hasAdminOrRolePermission(member, interaction.guildId)) {
       await interaction.reply({
@@ -184,7 +184,7 @@ export default class EditItemCommand extends Command {
             ? `${itemData.userLimit} per user`
             : "Unlimited",
           inline: true,
-        }
+        },
       )
       .setColor(0xf1c40f)
       .setTimestamp();
@@ -207,7 +207,7 @@ export default class EditItemCommand extends Command {
         inventory: newInventory || null,
         userLimit: newUserLimit || null,
       },
-      interaction.client
+      interaction.client,
     );
 
     return;

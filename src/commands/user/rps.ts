@@ -26,15 +26,15 @@ export default class RPSCommand extends Command {
             .addChoices(
               { name: "🪨 Rock", value: "rock" },
               { name: "📄 Paper", value: "paper" },
-              { name: "✂️ Scissors", value: "scissors" }
-            )
+              { name: "✂️ Scissors", value: "scissors" },
+            ),
         )
         .addIntegerOption((option) =>
           option
             .setName("amount")
             .setDescription("The amount of coins to bet.")
-            .setRequired(true)
-        )
+            .setRequired(true),
+        ),
     );
   }
 
@@ -111,7 +111,7 @@ export default class RPSCommand extends Command {
           name: "New Balance",
           value: `${userData.balance} coins`,
           inline: true,
-        }
+        },
       )
       .setTimestamp();
 
@@ -127,13 +127,13 @@ export default class RPSCommand extends Command {
         amount: resultAmount,
         description: `User played RPS (${emojiMap[userChoice]} vs. ${emojiMap[botChoice]}) and ${resultAmount > 0 ? "won" : "lost"} ${Math.abs(resultAmount)} coins.`,
       },
-      interaction.client
+      interaction.client,
     );
   }
 
   // Utility to pick a weighted random outcome
   private weightedRandom(
-    weights: { outcome: "win" | "lose" | "draw"; weight: number }[]
+    weights: { outcome: "win" | "lose" | "draw"; weight: number }[],
   ): "win" | "lose" | "draw" {
     const totalWeight = weights.reduce((sum, w) => sum + w.weight, 0);
     const random = Math.random() * totalWeight;
@@ -153,7 +153,7 @@ export default class RPSCommand extends Command {
   // Determine bot's choice based on user's choice and desired outcome
   private calculateBotChoice(
     userChoice: "rock" | "paper" | "scissors",
-    outcome: "win" | "lose" | "draw"
+    outcome: "win" | "lose" | "draw",
   ): "rock" | "paper" | "scissors" {
     const choiceMap: Record<
       "rock" | "paper" | "scissors",
@@ -168,7 +168,7 @@ export default class RPSCommand extends Command {
       return choiceMap[userChoice]; // Bot loses
     } else if (outcome === "lose") {
       return Object.keys(choiceMap).find(
-        (key) => choiceMap[key as "rock" | "paper" | "scissors"] === userChoice
+        (key) => choiceMap[key as "rock" | "paper" | "scissors"] === userChoice,
       ) as "rock" | "paper" | "scissors"; // Bot wins
     } else {
       return userChoice; // Draw

@@ -22,11 +22,11 @@ export class ReadyListener extends Listener {
     });
 
     Logger.info(
-      `Monitoring ${client.guilds.cache.size} guilds and ${client.users.cache.size} users.`
+      `Monitoring ${client.guilds.cache.size} guilds and ${client.users.cache.size} users.`,
     );
 
     Logger.info(
-      `Invite your bot to servers using this link: https://discord.com/oauth2/authorize?client_id=${id}&permissions=8&scope=bot%20applications.commands`
+      `Invite your bot to servers using this link: https://discord.com/oauth2/authorize?client_id=${id}&permissions=8&scope=bot%20applications.commands`,
     );
   }
 }

@@ -66,7 +66,7 @@ export function createEmbed(data: EmbedData): EmbedBuilder {
   // Handle fields with advanced validation
   if (data.fields) {
     const validFields = data.fields.filter(
-      (field) => field.name && field.value && field.value.length <= 1024
+      (field) => field.name && field.value && field.value.length <= 1024,
     ) as APIEmbedField[];
     if (validFields.length > 0) embed.addFields(...validFields);
   }

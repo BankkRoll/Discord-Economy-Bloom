@@ -24,8 +24,8 @@ export default class RemoveItemCommand extends Command {
           option
             .setName("item")
             .setDescription("The name of the item to remove.")
-            .setRequired(true)
-        )
+            .setRequired(true),
+        ),
     );
   }
 
@@ -71,7 +71,7 @@ export default class RemoveItemCommand extends Command {
         description: `Admin removed the item "${item}" from the shop.`,
         item,
       },
-      interaction.client
+      interaction.client,
     );
 
     return; // Ensure the function resolves

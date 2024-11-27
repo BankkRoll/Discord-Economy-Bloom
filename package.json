@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "A Discord bot for Deploy Now.",
   "main": "dist/index.js",
-  "author": "Bankkroll",
+  "license": "DeployNow-License-v1.0",
+  "author": "BankkRoll <https://deploynow.site",
   "type": "module",
-  "license": "ISC",
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
@@ -21,20 +21,15 @@
   ],
   "dependencies": {
     "@sapphire/framework": "^5.2.1",
-    "@supabase/supabase-js": "^2.45.1",
+    "axios": "^1.7.8",
     "discord.js": "^14.15.3",
     "dotenv": "^16.4.5",
     "enmap": "^6.0.3",
-    "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.5.4",
-    "uuid": "^10.0.0"
+    "typescript": "^5.5.4"
   },
   "devDependencies": {
     "@types/node": "^22.3.0",
     "eslint": "^8.49.0",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-import": "^2.28.1",
     "nodemon": "^3.1.4",
     "prettier": "^3.1.0",
     "ts-node": "^10.9.2"

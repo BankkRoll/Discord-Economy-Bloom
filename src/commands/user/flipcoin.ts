@@ -25,15 +25,15 @@ export default class FlipCoinCommand extends Command {
             .setRequired(true)
             .addChoices(
               { name: "Heads", value: "heads" },
-              { name: "Tails", value: "tails" }
-            )
+              { name: "Tails", value: "tails" },
+            ),
         )
         .addIntegerOption((option) =>
           option
             .setName("amount")
             .setDescription("The amount of coins to bet.")
-            .setRequired(true)
-        )
+            .setRequired(true),
+        ),
     );
   }
 
@@ -76,7 +76,7 @@ export default class FlipCoinCommand extends Command {
       .setTitle("🪙 Coin Flip Result 🪙")
       .setColor(isWin ? 0x22c55e : 0xf87171) // Green for win, red for loss
       .setDescription(
-        `${coinEmoji} The coin flipped and landed on **${result.toUpperCase()}**.\n\n${outcomeMessage}`
+        `${coinEmoji} The coin flipped and landed on **${result.toUpperCase()}**.\n\n${outcomeMessage}`,
       )
       .addFields(
         { name: "Your Choice", value: choice.toUpperCase(), inline: true },
@@ -85,7 +85,7 @@ export default class FlipCoinCommand extends Command {
           name: "New Balance",
           value: `${userData.balance} coins`,
           inline: true,
-        }
+        },
       )
       .setTimestamp();
 
@@ -103,7 +103,7 @@ export default class FlipCoinCommand extends Command {
           isWin ? "won" : "lost"
         } ${amount} coins in a coin flip (${choice}).`,
       },
-      interaction.client
+      interaction.client,
     );
   }
 }

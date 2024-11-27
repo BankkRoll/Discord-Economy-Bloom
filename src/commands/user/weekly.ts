@@ -16,7 +16,7 @@ export default class WeeklyCommand extends Command {
 
   registerApplicationCommands(registry: ApplicationCommandRegistry) {
     registry.registerChatInputCommand((builder) =>
-      builder.setName(this.name).setDescription(this.description)
+      builder.setName(this.name).setDescription(this.description),
     );
   }
 
@@ -48,7 +48,11 @@ export default class WeeklyCommand extends Command {
       description: `🎉 You've received \`${weeklyReward} coins\`!`,
       fields: [
         { name: "Reward", value: `${weeklyReward} coins`, inline: true },
-        { name: "New Balance", value: `${userData.balance} coins`, inline: true },
+        {
+          name: "New Balance",
+          value: `${userData.balance} coins`,
+          inline: true,
+        },
       ],
       color: 0x22c55e,
       timestamp: new Date(),
@@ -64,7 +68,7 @@ export default class WeeklyCommand extends Command {
         amount: weeklyReward,
         description: `User claimed weekly reward of ${weeklyReward} coins.`,
       },
-      interaction.client
+      interaction.client,
     );
   }
 }

@@ -23,7 +23,7 @@ export class ErrorListener extends Listener {
         guildId: message.guild?.id || "N/A",
         channelName: message.channel.name,
         channelId: message.channel.id,
-      }
+      },
     );
 
     // Optional: Notify the user that an error occurred

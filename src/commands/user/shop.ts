@@ -5,29 +5,26 @@ import {
   ChatInputCommandInteraction,
   ComponentType,
   EmbedBuilder,
-  MessageActionRowComponentBuilder,
 } from "discord.js";
 import { ApplicationCommandRegistry, Command } from "@sapphire/framework";
-
-import { ShopData } from "../../database/enmap.js";
+import { ShopData, UserData } from "../../database/enmap.js";
 
 export default class ShopCommand extends Command {
   constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
       name: "shop",
-      description: "View items available in the shop.",
+      description: "View items available in the shop and purchase them.",
     });
   }
 
   registerApplicationCommands(registry: ApplicationCommandRegistry) {
     registry.registerChatInputCommand((builder) =>
-      builder.setName(this.name).setDescription(this.description)
+      builder.setName(this.name).setDescription(this.description),
     );
   }
 
   async chatInputRun(interaction: ChatInputCommandInteraction) {
-    // Convert ShopData to an array
     const items = Array.from(ShopData.entries());
     if (items.length === 0) {
       await interaction.reply({
@@ -37,60 +34,79 @@ export default class ShopCommand extends Command {
       return;
     }
 
-    const itemsPerPage = 5;
-    const pages = Math.ceil(items.length / itemsPerPage);
-    let currentPage = 0;
+    let currentItemIndex = 0;
 
-    const generateEmbed = (page: number) => {
-      const start = page * itemsPerPage;
-      const end = start + itemsPerPage;
-      const currentItems = items.slice(start, end);
+    // Generate Embed for a single item
+    const generateEmbed = (index: number) => {
+      const [itemName, itemData] = items[index];
 
       const embed = new EmbedBuilder()
-        .setTitle("🛍️ Shop Items")
+        .setTitle(`🛍️ Shop Item #${index}: ${itemName}`)
         .setColor(0x2563eb)
-        .setTimestamp()
-        .setFooter({ text: `Page ${page + 1} of ${pages}` });
+        .setDescription(itemData.description || "No description provided.")
+        .addFields(
+          { name: "💰 Price", value: `${itemData.price} coins`, inline: false },
+          {
+            name: "👮 Role Granted",
+            value: itemData.role ? `<@&${itemData.role}>` : "None",
+            inline: false,
+          },
+          {
+            name: "📦 Inventory",
+            value: itemData.inventory
+              ? `${itemData.inventory - (itemData.sold || 0)} remaining`
+              : "Unlimited",
+            inline: false,
+          },
+          {
+            name: "👤 User Limit",
+            value: itemData.userLimit
+              ? `${itemData.userLimit} per user`
+              : "Unlimited",
+            inline: false,
+          },
+        )
+        .setFooter({
+          text: `Item ${index + 1} of ${items.length}`,
+        })
+        .setTimestamp();
 
-      currentItems.forEach(([itemName, itemData]) => {
-        embed.addFields({
-          name: itemName as string,
-          value: `**Price:** ${itemData.price} coins\n**Description:** ${
-            itemData.description || "No description provided."
-          }`,
-          inline: false,
-        });
-      });
+      if (itemData.imageUrl) {
+        embed.setImage(itemData.imageUrl);
+      }
 
       return embed;
     };
 
+    // Generate Navigation Buttons
     const generateButtons = () => {
-      const buttons = new ActionRowBuilder<MessageActionRowComponentBuilder>();
-      buttons.addComponents(
+      return new ActionRowBuilder<ButtonBuilder>().addComponents(
         new ButtonBuilder()
           .setCustomId("previous")
           .setLabel("Previous")
           .setStyle(ButtonStyle.Primary)
-          .setDisabled(currentPage === 0),
+          .setDisabled(currentItemIndex === 0),
         new ButtonBuilder()
           .setCustomId("next")
           .setLabel("Next")
           .setStyle(ButtonStyle.Primary)
-          .setDisabled(currentPage === pages - 1)
+          .setDisabled(currentItemIndex === items.length - 1),
+        new ButtonBuilder()
+          .setCustomId("buy")
+          .setLabel("Buy")
+          .setStyle(ButtonStyle.Success),
       );
-      return buttons;
     };
 
     const replyMessage = await interaction.reply({
-      embeds: [generateEmbed(currentPage)],
+      embeds: [generateEmbed(currentItemIndex)],
       components: [generateButtons()],
       fetchReply: true,
     });
 
     const collector = replyMessage.createMessageComponentCollector({
       componentType: ComponentType.Button,
-      time: 60000, // Collector runs for 60 seconds
+      time: 60000, // 1 minute
     });
 
     collector.on("collect", async (buttonInteraction) => {
@@ -102,17 +118,74 @@ export default class ShopCommand extends Command {
         return;
       }
 
-      if (buttonInteraction.customId === "previous" && currentPage > 0) {
-        currentPage--;
+      if (buttonInteraction.customId === "previous" && currentItemIndex > 0) {
+        currentItemIndex--;
       } else if (
         buttonInteraction.customId === "next" &&
-        currentPage < pages - 1
+        currentItemIndex < items.length - 1
       ) {
-        currentPage++;
+        currentItemIndex++;
+      } else if (buttonInteraction.customId === "buy") {
+        const [itemName, itemData] = items[currentItemIndex];
+        const userData = UserData.ensure(interaction.user.id, {
+          balance: 0,
+          inventory: [],
+        });
+
+        if (userData.balance < itemData.price) {
+          await buttonInteraction.reply({
+            content: `❌ You don't have enough coins to buy **${itemName}**. It costs \`${itemData.price} coins\`.`,
+            ephemeral: true,
+          });
+          return;
+        }
+
+        // Check inventory limits
+        if (itemData.inventory && itemData.sold >= itemData.inventory) {
+          await buttonInteraction.reply({
+            content: `❌ This item is out of stock.`,
+            ephemeral: true,
+          });
+          return;
+        }
+
+        // Check user limit
+        const userPurchases = userData.inventory.find(
+          (i: { item: string; quantity: number }) => i.item === itemName,
+        );
+        if (
+          itemData.userLimit &&
+          userPurchases?.quantity >= itemData.userLimit
+        ) {
+          await buttonInteraction.reply({
+            content: `❌ You have reached the purchase limit for **${itemName}**.`,
+            ephemeral: true,
+          });
+          return;
+        }
+
+        // Deduct balance, add to inventory, and update shop data
+        userData.balance -= itemData.price;
+        if (userPurchases) {
+          userPurchases.quantity += 1;
+        } else {
+          userData.inventory.push({ item: itemName, quantity: 1 });
+        }
+        UserData.set(interaction.user.id, userData);
+
+        itemData.sold = (itemData.sold || 0) + 1;
+        ShopData.set(itemName, itemData);
+
+        await buttonInteraction.reply({
+          content: `✅ You successfully purchased **${itemName}** for \`${itemData.price} coins\`! Remaining Balance: \`${userData.balance} coins\`.`,
+          ephemeral: true,
+        });
+        return;
       }
 
+      // Update the embed and buttons
       await buttonInteraction.update({
-        embeds: [generateEmbed(currentPage)],
+        embeds: [generateEmbed(currentItemIndex)],
         components: [generateButtons()],
       });
     });

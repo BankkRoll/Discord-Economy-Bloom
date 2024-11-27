@@ -5,7 +5,7 @@ export class Logger {
     const logMessage = {
       timestamp,
       level,
-      project: "DeployNow Bot",
+      project: "Bloom Bot",
       message,
       ...meta,
     };

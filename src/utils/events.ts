@@ -25,7 +25,7 @@ export async function logAction(
     role?: string | null;
     description?: string;
   },
-  client: Client
+  client: Client,
 ): Promise<void> {
   // Save the log to Enmap
   LogsData.set(Date.now().toString(), {
@@ -46,7 +46,7 @@ export async function logAction(
   if (!modlogChannelId) return;
 
   const modlogChannel = client.channels.cache.get(
-    modlogChannelId
+    modlogChannelId,
   ) as TextChannel;
   if (!modlogChannel) return;
 

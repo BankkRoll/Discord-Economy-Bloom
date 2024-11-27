@@ -16,7 +16,7 @@ export default class WorkCommand extends Command {
 
   registerApplicationCommands(registry: ApplicationCommandRegistry) {
     registry.registerChatInputCommand((builder) =>
-      builder.setName(this.name).setDescription(this.description)
+      builder.setName(this.name).setDescription(this.description),
     );
   }
 
@@ -129,7 +129,7 @@ export default class WorkCommand extends Command {
         amount: earnings,
         description: `User completed '${selectedJob.job}' and earned ${earnings} coins.`,
       },
-      interaction.client
+      interaction.client,
     );
   }
 }

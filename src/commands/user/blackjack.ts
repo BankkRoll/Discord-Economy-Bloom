@@ -29,8 +29,8 @@ export default class BlackjackCommand extends Command {
           option
             .setName("amount")
             .setDescription("The amount of coins to bet.")
-            .setRequired(true)
-        )
+            .setRequired(true),
+        ),
     );
   }
 
@@ -100,7 +100,7 @@ export default class BlackjackCommand extends Command {
       new ButtonBuilder()
         .setCustomId("stand")
         .setLabel("Stand")
-        .setStyle(ButtonStyle.Secondary)
+        .setStyle(ButtonStyle.Secondary),
     );
 
     const replyMessage = await interaction.reply({
@@ -177,7 +177,7 @@ export default class BlackjackCommand extends Command {
         .setColor(
           reason === "user_21" || dealerScore > 21 || userScore > dealerScore
             ? 0x22c55e
-            : 0xf87171
+            : 0xf87171,
         );
 
       await interaction.editReply({ embeds: [resultEmbed], components: [] });
@@ -197,7 +197,7 @@ export default class BlackjackCommand extends Command {
               : "lost"
           } ${betAmount} coins in Blackjack.`,
         },
-        client
+        client,
       );
     });
   }
