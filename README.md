@@ -4,14 +4,6 @@ Build smarter, faster, and better with Bloom – the ultimate Discord bot starte
 
 ---
 
-## ⚠️ Important
-
-**This bot template is exclusively for paid users.** Sharing, redistributing, or reselling is strictly prohibited. Each purchase grants a license for a single user or team use.
-
-> **Do not share. Redistribution violates your license agreement.**
-
----
-
 ## ✨ Features
 
 - **Advanced Command Framework**: Built with Sapphire.js for handling slash commands and context menus.
@@ -80,12 +72,30 @@ Build smarter, faster, and better with Bloom – the ultimate Discord bot starte
 
 ## 🚀 Getting Started
 
-### 1. **Download the Content**
+### 1. **Download or Fork the Repository**
 
-Access the download via Deploy Now's dashboard at anytime forever once purchased:
+#### **Option 1: Download as a ZIP**
+```
+1. Click the **Code** button on the repository page.
+2. Select **Download ZIP**.
+3. Extract the ZIP file to your desired location.
+```
 
-[View Product Directly](https://deploynow.site/products/economy-discord-bot)
-[View All Products Owned](https://deploynow.site/user/products)
+#### **Option 2: Clone the Repository (Recommended)**
+```sh
+git clone https://github.com/BankkRoll/Discord-Economy-Bloom.git
+```
+
+#### **Option 3: Fork the Repository**
+```
+1. Click the **Fork** button on the repository page.
+2. Navigate to your forked repository.
+3. Clone your fork using:
+```
+
+```sh
+git clone https://github.com/BankkRoll/Discord-Economy-Bloom.git
+```
 
 ---
 
@@ -130,7 +140,7 @@ npm run start
 
 ---
 
-## 📦 Deployment
+## 📦 ment
 
 Bloom is pre-configured for deployment on hosting platforms like SparkedHost, Railway, Heroku, or VPS servers.
 
@@ -138,26 +148,3 @@ Bloom is pre-configured for deployment on hosting platforms like SparkedHost, Ra
 2. Deploy using your preferred platform.
 3. Configure environment variables in the hosting environment.
 4. Launch your bot.
-
----
-
-## 📃 License
-
-## ⚠️ Important
-
-**This template is exclusively for paid users.** Sharing, redistributing, or reselling is strictly prohibited. Each purchase grants a license for a single user or team use.
-
-> **Do not share. Redistribution violates your license agreement.**
-
-This template is licensed for individual or team use. Redistribution, sharing, or resale in its original or modified form is strictly prohibited. Each purchase grants a license for personal or commercial use with adherence to the terms specified in the **DeployNow Software License Agreement (v1.0)**.
-
-For full details, refer to the [DeployNow Software License Agreement (v1.0)](LICENSE).
-
----
-
-## 💌 Support
-
-If you have any questions or need assistance, please contact us:
-
-[Contact Form](https://deploynow.site/contact)
-[Discord Server](https://discord.gg/7zV3EpRM4P)
