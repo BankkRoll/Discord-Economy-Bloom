@@ -140,7 +140,7 @@ npm run start
 
 ---
 
-## 📦 ment
+## 📦 Deployment
 
 Bloom is pre-configured for deployment on hosting platforms like SparkedHost, Railway, Heroku, or VPS servers.
 
